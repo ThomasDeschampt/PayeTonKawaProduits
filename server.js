@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const setupSwagger = require('./swagger');
 const { PrismaClient } = require('@prisma/client');
 require('dotenv').config();
 
@@ -11,6 +12,7 @@ app.use(cors());
 app.use(express.json());
 app.use("/api/produits", require("./routes/produits"));
 
+setupSwagger(app);
 
 app.use('*', (req, res) => {
   res.status(404).json({

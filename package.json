@@ -28,7 +28,9 @@
     "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.2",
     "path-to-regexp": "^6.2.1",
-    "prisma": "^6.8.2"
+    "prisma": "^6.8.2",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1"
   },
   "devDependencies": {
     "@types/node": "^22.15.21",
