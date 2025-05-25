@@ -21,10 +21,16 @@ const modifier = async (req, res) => {
     }
 
     const dataToUpdate = {};
-    if (nom !== undefined) dataToUpdate.nom = nom;
+    if (nom !== undefined && nom !== '') dataToUpdate.nom = nom;
     if (description !== undefined) dataToUpdate.description = description;
-    if (prix !== undefined) dataToUpdate.prix = parseFloat(prix);
-    if (stock !== undefined) dataToUpdate.stock = parseInt(stock);
+    if (prix !== undefined && prix !== '') {
+      const prixParsed = parseFloat(prix);
+      if (!isNaN(prixParsed)) dataToUpdate.prix = prixParsed;
+    }
+    if (stock !== undefined && stock !== '') {
+      const stockParsed = parseInt(stock);
+      if (!isNaN(stockParsed)) dataToUpdate.stock = stockParsed;
+    }
 
     const produitMisAJour = await prisma.produit.update({
       where: { id: parseInt(id) },

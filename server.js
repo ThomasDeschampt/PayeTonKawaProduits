@@ -29,7 +29,7 @@ app.listen(PORT, () => {
 
   //temporaire
   const token = jwt.sign(
-    { username: 'testuser' }, // payload
+    { username: 'testuser' },
     process.env.JWT_SECRET,
     { expiresIn: '1h' }
   );
