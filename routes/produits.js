@@ -19,25 +19,21 @@ router.delete('/supprimer/:id', authorized, supprimer);
 
 /**
  * @swagger
- * /produit/afficher:
- *   post:
- *     summary: Afficher un produit par ID
- *     description: Récupère les détails d'un produit spécifique en utilisant son identifiant
+ * /produit/afficher/{uuid}:
+ *   get:
+ *     summary: Afficher un produit par UUID
+ *     description: Récupère les détails d'un produit spécifique en utilisant son identifiant UUID
  *     tags:
  *       - Produits
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - id
- *             properties:
- *               id:
- *                 type: integer
- *                 description: L'identifiant unique du produit
- *                 example: 1
+ *     parameters:
+ *       - in: path
+ *         name: uuid
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *         description: L'identifiant unique du produit
+ *         example: 9eca355c-1984-4601-a2bb-9a36a80f5187
  *     responses:
  *       200:
  *         description: Produit trouvé avec succès
@@ -53,9 +49,10 @@ router.delete('/supprimer/:id', authorized, supprimer);
  *                   type: object
  *                   properties:
  *                     id:
- *                       type: integer
+ *                       type: string
+ *                       format: uuid
  *                       description: Identifiant du produit
- *                       example: 1
+ *                       example: 9eca355c-1984-4601-a2bb-9a36a80f5187
  *                     nom:
  *                       type: string
  *                       description: Nom du produit
@@ -79,6 +76,19 @@ router.delete('/supprimer/:id', authorized, supprimer);
  *                       format: date-time
  *                       description: Date de dernière modification
  *                       example: "2024-01-15T10:30:00Z"
+ *       400:
+ *         description: UUID invalide
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 message:
+ *                   type: string
+ *                   example: "UUID invalide"
  *       404:
  *         description: Produit non trouvé
  *         content:
@@ -132,9 +142,9 @@ router.delete('/supprimer/:id', authorized, supprimer);
  *                     type: object
  *                     properties:
  *                       id:
- *                         type: integer
+ *                         type: string
  *                         description: Identifiant du produit
- *                         example: 1
+ *                         example: 9eca355c-1984-4601-a2bb-9a36a80f5187
  *                       nom:
  *                         type: string
  *                         description: Nom du produit
@@ -169,7 +179,7 @@ router.delete('/supprimer/:id', authorized, supprimer);
  *                   success: true
  *                   data: [
  *                     {
- *                       id: 1,
+ *                       id: 9eca355c-1984-4601-a2bb-9a36a80f5187,
  *                       nom: "Café Arabica",
  *                       prix: 10.99,
  *                       description: "Café de haute qualité",
@@ -177,7 +187,7 @@ router.delete('/supprimer/:id', authorized, supprimer);
  *                       updated_at: "2024-01-15T10:30:00Z"
  *                     },
  *                     {
- *                       id: 2,
+ *                       id: 9eca355c-1984-4601-a2bb-9a36a80f5187,
  *                       nom: "Café Robusta",
  *                       prix: 12.99,
  *                       description: "Café robuste et corsé",
@@ -274,9 +284,9 @@ router.delete('/supprimer/:id', authorized, supprimer);
  *                   type: object
  *                   properties:
  *                     id:
- *                       type: integer
+ *                       type: string
  *                       description: Identifiant unique du produit créé
- *                       example: 1
+ *                       example: 9eca355c-1984-4601-a2bb-9a36a80f5187
  *                     nom:
  *                       type: string
  *                       description: Nom du produit
@@ -311,7 +321,7 @@ router.delete('/supprimer/:id', authorized, supprimer);
  *             example:
  *               success: true
  *               data:
- *                 id: 1
+ *                 id: 9eca355c-1984-4601-a2bb-9a36a80f5187
  *                 nom: "Café Arabica"
  *                 description: "Café de haute qualité"
  *                 prix: 10.99
@@ -367,9 +377,9 @@ router.delete('/supprimer/:id', authorized, supprimer);
  *         required: true
  *         description: Identifiant unique du produit à modifier
  *         schema:
- *           type: integer
+ *           type: string
  *           minimum: 1
- *           example: 1
+ *           example: 9eca355c-1984-4601-a2bb-9a36a80f5187
  *     requestBody:
  *       required: true
  *       content:
@@ -429,9 +439,9 @@ router.delete('/supprimer/:id', authorized, supprimer);
  *                   type: object
  *                   properties:
  *                     id:
- *                       type: integer
+ *                       type: string
  *                       description: Identifiant du produit
- *                       example: 1
+ *                       example: 9eca355c-1984-4601-a2bb-9a36a80f5187
  *                     nom:
  *                       type: string
  *                       description: Nom du produit
@@ -466,7 +476,7 @@ router.delete('/supprimer/:id', authorized, supprimer);
  *             example:
  *               success: true
  *               data:
- *                 id: 1
+ *                 id: 9eca355c-1984-4601-a2bb-9a36a80f5187
  *                 nom: "Café Arabica Premium"
  *                 description: "Café de haute qualité, sélectionné à la main"
  *                 prix: 13.99
@@ -503,9 +513,6 @@ router.delete('/supprimer/:id', authorized, supprimer);
  */
 
 
-const { PrismaClient } = require("@prisma/client");
-const prisma = new PrismaClient();
-
 /**
  * @swagger
  * /produit/supprimer:
@@ -524,15 +531,15 @@ const prisma = new PrismaClient();
  *               - id
  *             properties:
  *               id:
- *                 type: integer
+ *                 type: string
  *                 description: Identifiant unique du produit à supprimer
- *                 example: 1
+ *                 example: 9eca355c-1984-4601-a2bb-9a36a80f5187
  *                 minimum: 1
  *           examples:
  *             suppression:
  *               summary: Suppression d'un produit
  *               value:
- *                 id: 1
+ *                 id: 9eca355c-1984-4601-a2bb-9a36a80f5187
  *     responses:
  *       200:
  *         description: Produit supprimé avec succès

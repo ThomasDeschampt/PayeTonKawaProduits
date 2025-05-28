@@ -1,16 +1,16 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
-// Modifier un produit par id
+// Modifier un produit
 const modifier = async (req, res) => {
-    console.log("Modifier un produit ", req);
+  console.log("Modifier un produit ", req);
 
   try {
-    const { id } = req.params;
+    const { uuid } = req.params;
     const { nom, description, prix, stock } = req.body;
 
     const produitExistant = await prisma.produit.findUnique({
-      where: { id: parseInt(id) }
+      where: { id: uuid }
     });
 
     if (!produitExistant) {
@@ -33,15 +33,16 @@ const modifier = async (req, res) => {
     }
 
     const produitMisAJour = await prisma.produit.update({
-      where: { id: parseInt(id) },
+      where: { id: uuid },
       data: dataToUpdate
     });
 
     res.json({
       success: true,
-      data: produitMisAJour,
-      message: 'Produit mis à jour avec succès'
+      message: 'Produit mis à jour avec succès',
+      data: produitMisAJour
     });
+
   } catch (error) {
     console.error('Erreur:', error);
     res.status(500).json({
