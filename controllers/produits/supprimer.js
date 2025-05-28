@@ -6,10 +6,10 @@ const supprimer = async (req, res) => {
     console.log("Supprimer un produit ", req);
 
   try {
-    const { id } = req.body;
+    const { uuid } = req.params;
 
     const produitExistant = await prisma.produit.findUnique({
-      where: { id: parseInt(id) }
+      where: { id: uuid}
     });
 
     if (!produitExistant) {
@@ -20,7 +20,7 @@ const supprimer = async (req, res) => {
     }
 
     await prisma.produit.delete({
-      where: { id: parseInt(id) }
+      where: {id: uuid}
     });
 
     res.json({
