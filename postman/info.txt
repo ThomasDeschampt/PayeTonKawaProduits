@@ -1,0 +1,13 @@
+Pour tester les API : 
+
+- lancer le serveur avec la commande : 
+  npm run dev
+
+- copier le token jwt renvoyé dans la console
+- coller le token à la ligne 13 du fichier postman_environment.json
+
+- importer les fichiers postman_collection.json et postman_environment.json dans Postman
+
+-sélectionné l'environnement "API Produit - Dev" dans Postman
+
+- lancer les requêtes

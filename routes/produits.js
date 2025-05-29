@@ -11,11 +11,11 @@ const supprimer = require('../controllers/produits/supprimer');
 const modifier = require('../controllers/produits/modifier');
 
 
-router.get('/afficher/:uuid', authorized, afficher);
+router.get('/afficher/:uuid', authorized , afficher);
 router.get('/afficherAll', authorized, afficherAll);
 router.post('/ajouter', authorized, ajouter);
-router.put('/modifier/:id', authorized, modifier);
-router.delete('/supprimer/:id', authorized, supprimer);
+router.put('/modifier/:uuid', authorized, modifier);
+router.delete('/supprimer/:uuid', authorized, supprimer);
 
 /**
  * @swagger
