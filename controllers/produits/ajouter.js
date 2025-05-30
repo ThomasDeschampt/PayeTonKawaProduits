@@ -6,7 +6,7 @@ const ajouter = async (req, res) => {
     console.log("Ajouter un produit ", req);
 
   try {
-    const { nom, description, prix, stock } = req.body;
+    const { nom, description, prix, stock, photo_url } = req.body;
 
     if (!nom || prix === undefined) {
       return res.status(400).json({
@@ -20,7 +20,8 @@ const ajouter = async (req, res) => {
         nom,
         description: description || null,
         prix: parseFloat(prix),
-        stock: parseInt(stock) || 0
+        stock: parseInt(stock) || 0,
+        photo_url: photo_url || null
       }
     });
 

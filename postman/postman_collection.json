@@ -56,7 +56,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"nom\": \"café\",\n  \"prix\": 9.99,\n  \"description\": \"Dernier café\",\n  \"stock\": 50\n}"
+              "raw": "{\n  \"nom\": \"café\",\n  \"prix\": 9.99,\n  \"description\": \"Dernier café\",\n  \"stock\": 50\n,\n  \"photo_url\": \"https://example.com/image.jpg\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/ajouter",
@@ -98,7 +98,7 @@
 			],
 			"body": {
 			  "mode": "raw",
-			  "raw": "{\n  \"nom\": \"café Pro\",\n  \"prix\": 19.99,\n  \"description\": \"café Pro\",\n  \"stock\": 30\n}"
+			  "raw": "{\n  \"nom\": \"café Pro\",\n  \"prix\": 19.99,\n  \"description\": \"café Pro\",\n  \"stock\": 30\n, \"photo_url\": \"https://example.com/image_pro.jpg\"\n}"
 			},
 			"url": {
 			  "raw": "{{baseUrl}}/modifier/{{uuid}}",

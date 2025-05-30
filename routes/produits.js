@@ -66,6 +66,15 @@ router.delete('/supprimer/:uuid', authorized, supprimer);
  *                       type: string
  *                       description: Description du produit
  *                       example: "Café de haute qualité"
+ *                     stock:
+ *                       type: integer
+ *                       description: Quantité en stock
+ *                       example: 150
+ *                     photo_url:
+ *                       type: string
+ *                       format: uri
+ *                       description: URL de la photo du produit
+ *                       example: "https://example.com/images/cafe-arabica.jpg"
  *                     createdAt:
  *                       type: string
  *                       format: date-time
@@ -158,6 +167,15 @@ router.delete('/supprimer/:uuid', authorized, supprimer);
  *                         type: string
  *                         description: Description du produit
  *                         example: "Café de haute qualité"
+ *                       stock:
+ *                         type: integer
+ *                         description: Quantité en stock
+ *                         example: 150
+ *                       photo_url:
+ *                         type: string
+ *                         format: uri
+ *                         description: URL de la photo du produit
+ *                         example: "https://example.com/images/cafe-arabica.jpg"
  *                       created_at:
  *                         type: string
  *                         format: date-time
@@ -183,6 +201,8 @@ router.delete('/supprimer/:uuid', authorized, supprimer);
  *                       nom: "Café Arabica",
  *                       prix: 10.99,
  *                       description: "Café de haute qualité",
+ *                       stock: 150,
+ *                       photo_url: "https://example.com/images/cafe-arabica.jpg",
  *                       created_at: "2024-01-15T10:30:00Z",
  *                       updated_at: "2024-01-15T10:30:00Z"
  *                     },
@@ -191,6 +211,8 @@ router.delete('/supprimer/:uuid', authorized, supprimer);
  *                       nom: "Café Robusta",
  *                       prix: 12.99,
  *                       description: "Café robuste et corsé",
+ *                       stock: 90,
+ *                       photo_url: "https://example.com/images/cafe-robusta.jpg",
  *                       created_at: "2024-01-14T15:20:00Z",
  *                       updated_at: "2024-01-14T15:20:00Z"
  *                     }
@@ -256,6 +278,11 @@ router.delete('/supprimer/:uuid', authorized, supprimer);
  *                 description: Quantité en stock (optionnel, défaut = 0)
  *                 example: 50
  *                 minimum: 0
+ *               photo_url:
+ *                 type: string
+ *                 format: uri
+ *                 description: URL de la photo du produit (optionnel)
+ *                 example: "https://example.com/images/cafe-arabica.jpg"
  *           examples:
  *             produit_complet:
  *               summary: Produit avec toutes les informations
@@ -264,6 +291,7 @@ router.delete('/supprimer/:uuid', authorized, supprimer);
  *                 description: "Café de haute qualité"
  *                 prix: 10.99
  *                 stock: 25
+ *                 photo_url: "https://example.com/images/cafe-arabica.jpg"
  *             produit_minimal:
  *               summary: Produit avec informations minimales
  *               value:
@@ -305,6 +333,11 @@ router.delete('/supprimer/:uuid', authorized, supprimer);
  *                       type: integer
  *                       description: Quantité en stock
  *                       example: 25
+ *                     photo_url:
+ *                       type: string
+ *                       format: uri
+ *                       description: URL de la photo du produit
+ *                       example: "https://example.com/images/cafe-arabica.jpg"
  *                     created_at:
  *                       type: string
  *                       format: date-time
@@ -326,6 +359,7 @@ router.delete('/supprimer/:uuid', authorized, supprimer);
  *                 description: "Café de haute qualité"
  *                 prix: 10.99
  *                 stock: 25
+ *                 photo_url: "https://example.com/images/cafe-arabica.jpg"
  *                 created_at: "2024-01-15T10:30:00Z"
  *                 updated_at: "2024-01-15T10:30:00Z"
  *               message: "Produit créé avec succès"
@@ -378,7 +412,6 @@ router.delete('/supprimer/:uuid', authorized, supprimer);
  *         description: Identifiant unique du produit à modifier
  *         schema:
  *           type: string
- *           minimum: 1
  *           example: 9eca355c-1984-4601-a2bb-9a36a80f5187
  *     requestBody:
  *       required: true
@@ -391,7 +424,6 @@ router.delete('/supprimer/:uuid', authorized, supprimer);
  *                 type: string
  *                 description: Nouveau nom du produit (optionnel)
  *                 example: "Café Arabica Premium"
- *                 minLength: 1
  *               description:
  *                 type: string
  *                 description: Nouvelle description du produit (optionnel)
@@ -402,12 +434,15 @@ router.delete('/supprimer/:uuid', authorized, supprimer);
  *                 format: float
  *                 description: Nouveau prix du produit (optionnel)
  *                 example: 13.99
- *                 minimum: 0
  *               stock:
  *                 type: integer
  *                 description: Nouvelle quantité en stock (optionnel)
  *                 example: 30
- *                 minimum: 0
+ *               photo_url:
+ *                 type: string
+ *                 format: uri
+ *                 description: Nouvelle URL de la photo du produit (optionnel)
+ *                 example: "https://example.com/images/cafe-premium.jpg"
  *           examples:
  *             modification_complete:
  *               summary: Modification de tous les champs
@@ -416,6 +451,7 @@ router.delete('/supprimer/:uuid', authorized, supprimer);
  *                 description: "Café de haute qualité, sélectionné à la main"
  *                 prix: 13.99
  *                 stock: 15
+ *                 photo_url: "https://example.com/images/cafe-premium.jpg"
  *             modification_partielle:
  *               summary: Modification du prix seulement
  *               value:
@@ -460,6 +496,11 @@ router.delete('/supprimer/:uuid', authorized, supprimer);
  *                       type: integer
  *                       description: Quantité en stock
  *                       example: 30
+ *                     photo_url:
+ *                       type: string
+ *                       format: uri
+ *                       description: URL de la photo du produit
+ *                       example: "https://example.com/images/cafe-premium.jpg"
  *                     created_at:
  *                       type: string
  *                       format: date-time
@@ -481,6 +522,7 @@ router.delete('/supprimer/:uuid', authorized, supprimer);
  *                 description: "Café de haute qualité, sélectionné à la main"
  *                 prix: 13.99
  *                 stock: 30
+ *                 photo_url: "https://example.com/images/cafe-premium.jpg"
  *                 created_at: "2024-01-15T10:30:00Z"
  *                 updated_at: "2024-01-15T16:45:00Z"
  *               message: "Produit mis à jour avec succès"

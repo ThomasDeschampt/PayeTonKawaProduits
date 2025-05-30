@@ -7,7 +7,7 @@ const modifier = async (req, res) => {
 
   try {
     const { uuid } = req.params;
-    const { nom, description, prix, stock } = req.body;
+    const { nom, description, prix, stock, photo_url } = req.body;
 
     const produitExistant = await prisma.produit.findUnique({
       where: { id: uuid }
@@ -31,6 +31,7 @@ const modifier = async (req, res) => {
       const stockParsed = parseInt(stock);
       if (!isNaN(stockParsed)) dataToUpdate.stock = stockParsed;
     }
+    if (photo_url !== undefined && photo_url !== '') dataToUpdate.photo_url = photo_url;
 
     const produitMisAJour = await prisma.produit.update({
       where: { id: uuid },
