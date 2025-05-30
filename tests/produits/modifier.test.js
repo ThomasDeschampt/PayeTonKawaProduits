@@ -43,7 +43,8 @@ describe('modifier Controller', () => {
       req.body = {
         nom: "Nouveau Nom",
         prix: "25.5",
-        stock: "10"
+        stock: "10",
+        photo_url: 'http://example.com/photo.jpg'
       };
 
       prisma.produit.findUnique.mockResolvedValue(produitExistant);
@@ -57,7 +58,8 @@ describe('modifier Controller', () => {
         data: {
           nom: "Nouveau Nom",
           prix: 25.5,
-          stock: 10
+          stock: 10,
+          photo_url: 'http://example.com/photo.jpg'
         }
       });
 

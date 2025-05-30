@@ -44,7 +44,8 @@ describe('ajouter Controller', () => {
         nom: 'Produit Test',
         description: 'Description du produit test',
         prix: '25.99',
-        stock: '10'
+        stock: '10',
+        photo_url: 'http://example.com/photo.jpg',
       };
 
       // Données mockées de retour
@@ -54,6 +55,7 @@ describe('ajouter Controller', () => {
         description: 'Description du produit test',
         prix: 25.99,
         stock: 10,
+        photo_url: 'http://example.com/photo.jpg',
         created_at: new Date('2024-01-01')
       };
 
@@ -73,7 +75,8 @@ describe('ajouter Controller', () => {
           nom: 'Produit Test',
           description: 'Description du produit test',
           prix: 25.99,
-          stock: 10
+          stock: 10,
+          photo_url: 'http://example.com/photo.jpg'
         }
       });
 
@@ -90,7 +93,8 @@ describe('ajouter Controller', () => {
     it('devrait créer un produit avec seulement nom et prix', async () => {
       req.body = {
         nom: 'Produit Minimal',
-        prix: '15.50'
+        prix: '15.50',
+        photo_url: 'http://example.com/photo.jpg'
       };
 
       const mockNouveauProduit = {
@@ -113,7 +117,8 @@ describe('ajouter Controller', () => {
           nom: 'Produit Minimal',
           description: null,
           prix: 15.50,
-          stock: 0
+          stock: 0,
+          photo_url: 'http://example.com/photo.jpg'
         }
       });
 
@@ -132,7 +137,8 @@ describe('ajouter Controller', () => {
         nom: 'Produit Sans Description',
         prix: 99.99,
         description: '',
-        stock: '' // chaîne vide
+        stock: '', // chaîne vide
+        photo_url: 'http://example.com/photo.jpg'
       };
 
       const mockNouveauProduit = {
@@ -140,7 +146,8 @@ describe('ajouter Controller', () => {
         nom: 'Produit Sans Description',
         description: null,
         prix: 99.99,
-        stock: 0
+        stock: 0,
+        photo_url: 'http://example.com/photo.jpg'
       };
 
       prisma.produit.create.mockResolvedValue(mockNouveauProduit);
@@ -154,7 +161,8 @@ describe('ajouter Controller', () => {
           nom: 'Produit Sans Description',
           description: null, // '' || null = null
           prix: 99.99,
-          stock: 0 // parseInt('') || 0 = 0
+          stock: 0, // parseInt('') || 0 = 0
+          photo_url: 'http://example.com/photo.jpg'
         }
       });
 
@@ -165,7 +173,8 @@ describe('ajouter Controller', () => {
       req.body = {
         nom: 'Produit Conversion',
         prix: '123.456', // nombre décimal en string
-        stock: '25' // entier en string
+        stock: '25', // entier en string
+        photo_url: 'http://example.com/photo.jpg'
       };
 
       const mockNouveauProduit = {
@@ -173,7 +182,8 @@ describe('ajouter Controller', () => {
         nom: 'Produit Conversion',
         description: null,
         prix: 123.456,
-        stock: 25
+        stock: 25,
+        photo_url: 'http://example.com/photo.jpg'
       };
 
       prisma.produit.create.mockResolvedValue(mockNouveauProduit);
@@ -187,7 +197,8 @@ describe('ajouter Controller', () => {
           nom: 'Produit Conversion',
           description: null,
           prix: 123.456,
-          stock: 25
+          stock: 25,
+          photo_url: 'http://example.com/photo.jpg'
         }
       });
 
@@ -199,7 +210,7 @@ describe('ajouter Controller', () => {
     it('devrait retourner une erreur si le nom est manquant', async () => {
       req.body = {
         prix: '25.99',
-        description: 'Test'
+        description: 'Test',
       };
 
       const consoleLogSpy = jest.spyOn(console, 'log').mockImplementation();
@@ -270,7 +281,8 @@ describe('ajouter Controller', () => {
         nom: 'Produit Gratuit',
         description: null,
         prix: 0,
-        stock: 0
+        stock: 0,
+        photo_url: null
       };
 
       prisma.produit.create.mockResolvedValue(mockNouveauProduit);
@@ -284,7 +296,8 @@ describe('ajouter Controller', () => {
           nom: 'Produit Gratuit',
           description: null,
           prix: 0,
-          stock: 0
+          stock: 0,
+          photo_url: null
         }
       });
 
@@ -370,7 +383,8 @@ describe('ajouter Controller', () => {
           nom: 'Test Appel',
           description: 'Description test',
           prix: 50.00,
-          stock: 5
+          stock: 5,
+          photo_url: null
         }
       });
 
@@ -419,7 +433,8 @@ describe('ajouter Controller', () => {
           nom: 'Produit NaN',
           description: null,
           prix: 15.99,
-          stock: 0 // parseInt('abc') || 0 = 0
+          stock: 0, // parseInt('abc') || 0 = 0
+          photo_url: null
         }
       });
 
@@ -449,7 +464,8 @@ describe('ajouter Controller', () => {
           nom: 'Produit Précis',
           description: null,
           prix: 19.999999,
-          stock: 0
+          stock: 0,
+          photo_url: null
         }
       });
 
@@ -460,14 +476,18 @@ describe('ajouter Controller', () => {
       req.body = {
         nom: 'Produit Négatif',
         prix: '10.00',
-        stock: '-5'
+        stock: '-5',
+        description: null,
+        photo_url: null
       };
 
       const mockProduit = {
         id: 9,
         nom: 'Produit Négatif',
         prix: 10.00,
-        stock: -5
+        stock: -5,
+        description: null,
+        photo_url: null
       };
 
       prisma.produit.create.mockResolvedValue(mockProduit);
@@ -481,7 +501,9 @@ describe('ajouter Controller', () => {
           nom: 'Produit Négatif',
           description: null,
           prix: 10.00,
-          stock: -5
+          stock: -5,
+          photo_url: null
+
         }
       });
 
