@@ -12,7 +12,7 @@ const modifier = require('../controllers/produits/modifier');
 
 
 router.get('/afficher/:uuid', authorized , afficher);
-router.get('/afficherAll', afficherAll);
+router.get('/afficherAll', authorized, afficherAll);
 router.post('/ajouter', authorized, ajouter);
 router.put('/modifier/:uuid', authorized, modifier);
 router.delete('/supprimer/:uuid', authorized, supprimer);
