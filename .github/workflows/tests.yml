@@ -7,19 +7,24 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest # Utilise la dernière version d'Ubuntu pour l'environnement d'exécution
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+    - name: Vérifier le code # Étape pour cloner votre dépôt
+      uses: actions/checkout@v4
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
+    - name: Configurer Node.js # Étape pour configurer l'environnement Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20' # Utilisez la version de Node.js que vous utilisez dans votre projet (par exemple, 18, 20, 22)
+        cache: 'npm' # Active le cache pour les dépendances npm afin d'accélérer les builds
 
-      - name: Install dependencies
-        run: npm install
+    - name: Installer les dépendances # Étape pour installer les packages npm
+      run: npm ci # 'npm ci' est préféré à 'npm install' dans les CI car il utilise package-lock.json pour des builds reproductibles
 
-      - name: Run Jest tests with coverage
-        run: npm test
+    - name: Lancer les tests unitaires avec Jest # Étape principale pour exécuter les tests
+      run: npm test # ou 'jest' si vous n'avez pas de script 'test' dans package.json
+      env:
+        NODE_ENV: test # Définit l'environnement comme 'test' si vos tests en dépendent
+        # Si vous avez des variables d'environnement spécifiques aux tests, ajoutez-les ici
+        # MY_TEST_ENV_VAR: ${{ secrets.MY_SECRET_VAR }} # Exemple pour une variable secrète
