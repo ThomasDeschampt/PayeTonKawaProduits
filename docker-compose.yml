@@ -4,12 +4,13 @@ services:
   api-produits:
     build: .
     ports:
-      - "3001:3000"
+      - "3001:3001"
     environment:
       - NODE_ENV=development
       - DATABASE_URL=${DATABASE_URL}
       - RABBITMQ_URL=amqp://admin:admin@rabbitmq:5672
       - DEBUG=*
+      - PORT=3001
     volumes:
       - ./:/usr/src/app
       - /usr/src/app/node_modules
@@ -73,7 +74,7 @@ services:
   grafana:
     image: grafana/grafana:latest
     ports:
-      - "7070:7070"
+      - "7070:3000"
     volumes:
       - grafana_data:/var/lib/grafana
       - ./grafana/provisioning:/etc/grafana/provisioning
