@@ -1,0 +1,63 @@
+name: Build et Lancement du Service Backend JS
+
+on:
+  push:
+    branches:
+      - main    # Déclenche le workflow à chaque push sur la branche 'main'
+      - develop # Si vous utilisez une branche de développement, le déclenche aussi
+  pull_request:
+    branches:
+      - main    # Déclenche pour les Pull Requests ciblant 'main'
+      - develop # Si vous utilisez une branche de développement, le déclenche aussi
+
+jobs:
+  build_and_start:
+    runs-on: ubuntu-latest # Utilise la dernière version d'Ubuntu pour l'environnement d'exécution
+
+    steps:
+    - name: 🚀 Cloner le code du dépôt
+      uses: actions/checkout@v4 # Action pour récupérer votre code depuis GitHub
+
+    - name: ⚙️ Configurer l'environnement Node.js
+      uses: actions/setup-node@v4 # Action pour installer Node.js
+      with:
+        node-version: '20' # IMPORTANT : Assurez-vous que cette version de Node.js correspond à celle de votre projet
+        cache: 'npm'       # Active le cache pour les dépendances npm, ce qui accélère les exécutions futures
+
+    - name: 📦 Installer les dépendances npm
+      run: npm ci # 'npm ci' est préféré à 'npm install' dans les CI pour des builds reproductibles et plus rapides
+
+    - name: 🏗️ Lancer le build du projet (si applicable)
+      # Cette étape est optionnelle et dépend de votre projet.
+      # Si votre projet est un backend Node.js pur sans étape de compilation (pas de TypeScript, pas de frontend à compiler),
+      # vous pouvez supprimer ou commenter cette étape.
+      # Si vous avez un script 'build' dans votre package.json (ex: pour TypeScript, ou un frontend), décommentez ceci:
+      # run: npm run build
+      run: echo "Pas de commande de build spécifiée pour ce projet. Ignorant l'étape de build." # Message par défaut si pas de build
+
+    - name: 🏁 Démarrer le serveur et vérifier son accessibilité
+      run: |
+        echo "Démarrage du serveur via npm start..."
+        # Lancer le serveur en arrière-plan. Le '&' est crucial pour ne pas bloquer le workflow.
+        # Utilisez 'npm start' ou 'npm run start:prod' si vous avez un script dédié pour la production/CI
+        npm start &
+
+        echo "Attente de 10 secondes pour le démarrage complet du serveur..."
+        sleep 10 # Ajustez si votre serveur prend plus ou moins de temps à démarrer
+
+        echo "Vérification de l'accessibilité du serveur sur http://localhost:${{ env.PORT }}/api"
+        # Utilise curl pour tester la disponibilité.
+        # --fail: Fait échouer la commande si la réponse HTTP est >= 400 ou n'est pas 2xx/3xx.
+        # Remplacez '/api' par le chemin de votre endpoint API principal ou un endpoint de "health check".
+        curl --fail http://localhost:${{ env.PORT }}/api
+
+        echo "Serveur démarré et API accessible avec succès !"
+      env:
+        # Les variables d'environnement sont injectées ici à partir des secrets GitHub
+        # Les noms des variables (DATABASE_URL, JWT_SECRET, JWT_EXPIRE) doivent correspondre EXACTEMENT
+        # aux noms que vous avez définis dans les secrets de votre dépôt GitHub (Repository secrets).
+        DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        JWT_SECRET: ${{ secrets.JWT_SECRET }}
+        JWT_EXPIRE: ${{ secrets.JWT_EXPIRE }}
+        PORT: 3000 # Définissez le port sur lequel votre serveur écoute. Utilisez un nombre, pas une chaîne.
+        # Ajoutez toute autre variable d'environnement nécessaire au démarrage de votre application.
