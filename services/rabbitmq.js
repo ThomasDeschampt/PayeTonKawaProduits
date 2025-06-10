@@ -1,36 +1,29 @@
 const amqp = require('amqplib');
+require('dotenv').config();
+
+const RABBITMQ_URL = process.env.RABBITMQ_URL || 'amqp://admin:admin@localhost:5672';
+const MAX_RETRIES = 5;
+const RETRY_DELAY = 5000;
 
 class RabbitMQService {
     constructor() {
         this.connection = null;
         this.channel = null;
         this.queues = {
-            port3002: 'queue_3002',
-            port3003: 'queue_3003',
-            port3004: 'queue_3004'
+            port3002: 'queue_port_3002',
+            port3003: 'queue_port_3003',
+            port3004: 'queue_port_3004'
         };
-        this.maxRetries = 5;
-        this.retryDelay = 5000;
     }
 
     async connect() {
         let retries = 0;
-        while (retries < this.maxRetries) {
+        
+        while (retries < MAX_RETRIES) {
             try {
-                console.log(`Tentative de connexion à RabbitMQ (${retries + 1}/${this.maxRetries})...`);
-                this.connection = await amqp.connect(process.env.RABBITMQ_URL);
-                console.log('Connexion à RabbitMQ établie avec succès');
+                console.log(`Tentative de connexion à RabbitMQ (${retries + 1}/${MAX_RETRIES})...`);
+                this.connection = await amqp.connect(RABBITMQ_URL);
                 
-                this.channel = await this.connection.createChannel();
-                console.log('Canal RabbitMQ créé avec succès');
-
-                for (const queue of Object.values(this.queues)) {
-                    await this.channel.assertQueue(queue, {
-                        durable: true
-                    });
-                    console.log(`File d'attente ${queue} déclarée`);
-                }
-
                 this.connection.on('error', (err) => {
                     console.error('Erreur de connexion RabbitMQ:', err);
                     this.reconnect();
@@ -41,18 +34,26 @@ class RabbitMQService {
                     this.reconnect();
                 });
 
-                return true;
+                this.channel = await this.connection.createChannel();
+                console.log('Connecté à RabbitMQ avec succès');
+
+                // Déclaration des queues
+                for (const queue of Object.values(this.queues)) {
+                    await this.channel.assertQueue(queue, {
+                        durable: true
+                    });
+                }
+
+                return;
             } catch (error) {
                 retries++;
-                console.error(`Erreur de connexion à RabbitMQ (tentative ${retries}/${this.maxRetries}):`, error.message);
+                console.error(`Échec de la connexion à RabbitMQ (tentative ${retries}/${MAX_RETRIES}):`, error.message);
                 
-                if (retries === this.maxRetries) {
-                    console.error('Nombre maximum de tentatives atteint. Impossible de se connecter à RabbitMQ.');
-                    throw error;
+                if (retries === MAX_RETRIES) {
+                    throw new Error(`Impossible de se connecter à RabbitMQ après ${MAX_RETRIES} tentatives`);
                 }
                 
-                console.log(`Nouvelle tentative dans ${this.retryDelay/1000} secondes...`);
-                await new Promise(resolve => setTimeout(resolve, this.retryDelay));
+                await new Promise(resolve => setTimeout(resolve, RETRY_DELAY));
             }
         }
     }
@@ -66,31 +67,27 @@ class RabbitMQService {
             }
         }
         
-        this.connection = null;
-        this.channel = null;
-        
-        try {
-            await this.connect();
-        } catch (error) {
-            console.error('Échec de la reconnexion:', error);
-        }
+        setTimeout(() => {
+            console.log('Tentative de reconnexion à RabbitMQ...');
+            this.connect().catch(error => {
+                console.error('Échec de la reconnexion:', error);
+            });
+        }, RETRY_DELAY);
     }
 
-    async sendMessage(queue, message) {
+    async sendMessage(queueName, message) {
         if (!this.channel) {
-            throw new Error('Canal RabbitMQ non initialisé');
+            throw new Error('Channel non initialisé');
         }
 
         try {
-            const queueName = this.queues[queue];
-            if (!queueName) {
-                throw new Error(`File d'attente ${queue} non trouvée`);
+            const queue = this.queues[queueName];
+            if (!queue) {
+                throw new Error(`Queue ${queueName} non trouvée`);
             }
 
-            await this.channel.sendToQueue(queueName, Buffer.from(JSON.stringify(message)), {
-                persistent: true
-            });
-            console.log(`Message envoyé à la file d'attente ${queueName}`);
+            await this.channel.sendToQueue(queue, Buffer.from(JSON.stringify(message)));
+            console.log(`Message envoyé à la queue ${queueName}`);
         } catch (error) {
             console.error('Erreur lors de l\'envoi du message:', error);
             throw error;
@@ -99,16 +96,18 @@ class RabbitMQService {
 
     async listenToPort(port, callback) {
         if (!this.channel) {
-            throw new Error('Canal RabbitMQ non initialisé');
+            throw new Error('Channel non initialisé');
         }
 
-        const queueName = this.queues[`port${port}`];
-        if (!queueName) {
-            throw new Error(`Port ${port} non configuré`);
+        const queueName = `port${port}`;
+        const queue = this.queues[queueName];
+        
+        if (!queue) {
+            throw new Error(`Queue pour le port ${port} non trouvée`);
         }
 
         try {
-            await this.channel.consume(queueName, (msg) => {
+            await this.channel.consume(queue, (msg) => {
                 if (msg !== null) {
                     const content = JSON.parse(msg.content.toString());
                     console.log(`Message reçu du port ${port}:`, content);
@@ -116,23 +115,23 @@ class RabbitMQService {
                     this.channel.ack(msg);
                 }
             });
-            console.log(`Écoute des messages du port ${port} démarrée`);
+            console.log(`Écoute active sur le port ${port}`);
         } catch (error) {
-            console.error(`Erreur lors de l'écoute des messages du port ${port}:`, error);
+            console.error(`Erreur lors de l'écoute du port ${port}:`, error);
             throw error;
         }
     }
 
     async listenToPort3002(callback) {
-        await this.listenToPort(3002, callback);
+        return this.listenToPort(3002, callback);
     }
 
     async listenToPort3003(callback) {
-        await this.listenToPort(3003, callback);
+        return this.listenToPort(3003, callback);
     }
 
     async listenToPort3004(callback) {
-        await this.listenToPort(3004, callback);
+        return this.listenToPort(3004, callback);
     }
 
     async close() {
@@ -145,4 +144,5 @@ class RabbitMQService {
     }
 }
 
-module.exports = new RabbitMQService(); 
+const rabbitmq = new RabbitMQService();
+module.exports = rabbitmq; 
