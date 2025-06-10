@@ -5,6 +5,7 @@ const setupSwagger = require('./swagger');
 const { PrismaClient } = require('@prisma/client');
 const rabbitmq = require('./services/rabbitmq');
 const jwt = require('jsonwebtoken');
+const { metricsMiddleware, metricsRoute } = require('./middleware/metrics');
 require('dotenv').config();
 
 const app = express();
@@ -51,9 +52,13 @@ const limiter = rateLimit({
     legacyHeaders: false,
 });
 
+app.use(metricsMiddleware);
+
 app.use(limiter);
 app.use(cors());
 app.use(express.json());
+
+app.get('/metrics', metricsRoute);
 
 app.get('/health', (req, res) => {
     res.status(200).json({ status: 'OK' });
@@ -105,6 +110,7 @@ const server = app.listen(PORT, async () => {
     console.log(`Serveur démarré sur le port ${PORT}`);
     console.log(`API disponible sur http://localhost:${PORT}/api`);
     console.log('Protection DDoS activée (100 req/15min par IP)');
+    console.log('Métriques Prometheus disponibles sur /metrics');
 
     try {
         await initializeRabbitMQ();
