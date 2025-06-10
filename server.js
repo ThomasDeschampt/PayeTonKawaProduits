@@ -10,7 +10,7 @@ require('dotenv').config();
 
 const app = express();
 const prisma = new PrismaClient();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3007;
 
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000,
@@ -35,7 +35,6 @@ app.get('/health', (req, res) => {
     res.status(200).json({ status: 'OK' });
 });
 
-app.use("/api/produits", verifyToken, require("./routes/produits"));
 
 setupSwagger(app);
 
@@ -82,6 +81,17 @@ const server = app.listen(PORT, async () => {
     console.log(`API disponible sur http://localhost:${PORT}/api`);
     console.log('Protection DDoS activée (100 req/15min par IP)');
     console.log('Métriques Prometheus disponibles sur /metrics');
+
+    const jwt = require("jsonwebtoken");
+
+
+    const token = jwt.sign({ username: "testuser" }, process.env.JWT_SECRET, {
+        expiresIn: "1h",
+    });
+
+
+    console.log(token);
+
 
     try {
         await initializeRabbitMQ();
