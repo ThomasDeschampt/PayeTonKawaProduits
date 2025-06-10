@@ -12,35 +12,6 @@ const app = express();
 const prisma = new PrismaClient();
 const PORT = process.env.PORT || 3000;
 
-const JWT_SECRET = process.env.JWT_SECRET || 'votre_secret_jwt_super_securise_2024';
-const JWT_EXPIRATION = '1h';
-
-const verifyToken = (req, res, next) => {
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1];
-
-    if (!token) {
-        return res.status(401).json({ message: 'Token manquant' });
-    }
-
-    jwt.verify(token, JWT_SECRET, (err, user) => {
-        if (err) {
-            return res.status(403).json({ message: 'Token invalide ou expiré' });
-        }
-        req.user = user;
-        next();
-    });
-};
-
-app.post('/api/auth/token', (req, res) => {
-    const token = jwt.sign({ 
-        id: 1,
-        timestamp: new Date().toISOString()
-    }, JWT_SECRET, { expiresIn: JWT_EXPIRATION });
-    
-    res.json({ token });
-});
-
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000,
     max: 100,
