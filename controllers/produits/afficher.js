@@ -1,6 +1,6 @@
 const produitService = require('../../services/produits');
 
-const afficher = async (req, res) => {
+const afficher = async (req, res, next) => {
   try {
     const { uuid } = req.params;
     const produit = await produitService.getProduit(uuid);
@@ -17,11 +17,7 @@ const afficher = async (req, res) => {
       data: produit
     });
   } catch (error) {
-    console.error('Erreur:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Erreur serveur'
-    });
+    next(error);
   }
 };
 

@@ -1,4 +1,5 @@
 const { PrismaClient } = require("@prisma/client");
+const { ValidationError, NotFoundError } = require('../utils/errors');
 const prisma = new PrismaClient();
 
 class ProduitService {
@@ -6,7 +7,7 @@ class ProduitService {
     const { nom, description, prix, stock, photo_url } = produitData;
 
     if (!nom || prix === undefined) {
-      throw new Error('Le nom et le prix sont requis');
+      throw new ValidationError('Le nom et le prix sont requis');
     }
 
     return await prisma.produit.create({
@@ -21,9 +22,15 @@ class ProduitService {
   }
 
   async getProduit(uuid) {
-    return await prisma.produit.findUnique({
+    const produit = await prisma.produit.findUnique({
       where: { id: uuid }
     });
+
+    if (!produit) {
+      throw new NotFoundError('Produit non trouvé');
+    }
+
+    return produit;
   }
 
   async getAllProduits() {
@@ -35,6 +42,14 @@ class ProduitService {
   }
 
   async updateProduit(uuid, produitData) {
+    const produit = await prisma.produit.findUnique({
+      where: { id: uuid }
+    });
+
+    if (!produit) {
+      throw new NotFoundError('Produit non trouvé');
+    }
+
     const { nom, description, prix, stock, photo_url } = produitData;
 
     return await prisma.produit.update({
@@ -50,6 +65,14 @@ class ProduitService {
   }
 
   async deleteProduit(uuid) {
+    const produit = await prisma.produit.findUnique({
+      where: { id: uuid }
+    });
+
+    if (!produit) {
+      throw new NotFoundError('Produit non trouvé');
+    }
+
     return await prisma.produit.delete({
       where: { id: uuid }
     });

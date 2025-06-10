@@ -6,15 +6,16 @@ const { PrismaClient } = require('@prisma/client');
 const rabbitmq = require('./services/rabbitmq');
 const jwt = require('jsonwebtoken');
 const { metricsMiddleware, metricsRoute } = require('./middleware/metrics');
+const errorHandler = require('./middleware/error.middleware');
+const config = require('./config');
 require('dotenv').config();
 
 const app = express();
 const prisma = new PrismaClient();
-const PORT = process.env.PORT || 3007;
 
 const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 100,
+    windowMs: config.rateLimit.windowMs,
+    max: config.rateLimit.max,
     message: {
         success: false,
         message: 'Trop de requêtes depuis cette IP, réessayez dans 15 minutes.'
@@ -24,7 +25,6 @@ const limiter = rateLimit({
 });
 
 app.use(metricsMiddleware);
-
 app.use(limiter);
 app.use(cors());
 app.use(express.json());
@@ -36,7 +36,6 @@ app.get('/health', (req, res) => {
     res.status(200).json({ status: 'OK' });
 });
 
-
 setupSwagger(app);
 
 app.use('*', (req, res) => {
@@ -46,14 +45,7 @@ app.use('*', (req, res) => {
     });
 });
 
-app.use((err, req, res, next) => {
-    console.error('Erreur serveur:', err);
-    res.status(500).json({
-        success: false,
-        message: 'Erreur interne du serveur',
-        error: process.env.NODE_ENV === 'development' ? err.message : undefined
-    });
-});
+app.use(errorHandler);
 
 async function initializeRabbitMQ() {
     try {
@@ -77,22 +69,11 @@ async function initializeRabbitMQ() {
     }
 }
 
-const server = app.listen(PORT, async () => {
-    console.log(`Serveur démarré sur le port ${PORT}`);
-    console.log(`API disponible sur http://localhost:${PORT}/api`);
+const server = app.listen(config.server.port, async () => {
+    console.log(`Serveur démarré sur le port ${config.server.port}`);
+    console.log(`API disponible sur http://localhost:${config.server.port}/api`);
     console.log('Protection DDoS activée (100 req/15min par IP)');
     console.log('Métriques Prometheus disponibles sur /metrics');
-
-    const jwt = require("jsonwebtoken");
-
-
-    const token = jwt.sign({ username: "testuser" }, process.env.JWT_SECRET, {
-        expiresIn: "1h",
-    });
-
-
-    console.log(token);
-
 
     try {
         await initializeRabbitMQ();

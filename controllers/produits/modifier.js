@@ -1,6 +1,6 @@
 const produitService = require('../../services/produits');
 
-const modifier = async (req, res) => {
+const modifier = async (req, res, next) => {
   try {
     const { uuid } = req.params;
     const produit = await produitService.updateProduit(uuid, req.body);
@@ -18,11 +18,7 @@ const modifier = async (req, res) => {
       message: 'Produit modifié avec succès'
     });
   } catch (error) {
-    console.error('Erreur:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Erreur serveur'
-    });
+    next(error);
   }
 };
 
