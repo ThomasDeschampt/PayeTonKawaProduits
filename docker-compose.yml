@@ -1,13 +1,10 @@
 version: '3.8'
 
 services:
-  api:
+  api-produits:
     build: .
     ports:
-      - "3001:3000"
       - "3002:3000"
-      - "3003:3000"
-      - "3004:3000"
     environment:
       - NODE_ENV=production
       - DATABASE_URL=${DATABASE_URL}
@@ -17,7 +14,39 @@ services:
       - /usr/src/app/node_modules
     depends_on:
       - rabbitmq
-    restart: unless-stopped 
+    restart: unless-stopped
+
+  api-commandes:
+    build: 
+      context: ../PayeTonKawaCommandes
+    ports:
+      - "3003:3000"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=${DATABASE_URL}
+      - RABBITMQ_URL=amqp://rabbitmq:5672
+    volumes:
+      - ../PayeTonKawaCommandes:/usr/src/app
+      - /usr/src/app/node_modules
+    depends_on:
+      - rabbitmq
+    restart: unless-stopped
+
+  api-clients:
+    build:
+      context: ../PayeTonKawaClients
+    ports:
+      - "3004:3000"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=${DATABASE_URL}
+      - RABBITMQ_URL=amqp://rabbitmq:5672
+    volumes:
+      - ../PayeTonKawaClients:/usr/src/app
+      - /usr/src/app/node_modules
+    depends_on:
+      - rabbitmq
+    restart: unless-stopped
 
   rabbitmq:
     image: rabbitmq:3-management

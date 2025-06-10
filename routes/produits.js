@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const rabbitmq = require('../services/rabbitmq');
 
 const authorized = require('../middleware/auth');
 const validateUUID = require('../middleware/uuidValidation.js');
@@ -17,6 +18,35 @@ router.get('/afficherAll', authorized, afficherAll);
 router.post('/ajouter', authorized, ajouter);
 router.put('/modifier/:uuid', authorized, validateUUID, modifier);
 router.delete('/supprimer/:uuid', authorized, supprimer);
+
+// Route de test pour RabbitMQ
+router.post('/test-rabbitmq', async (req, res) => {
+    try {
+        const message = {
+            type: 'TEST_API',
+            data: {
+                message: 'Test depuis l\'API',
+                timestamp: new Date().toISOString(),
+                ...req.body
+            }
+        };
+
+        await rabbitmq.sendMessage('produits', message);
+        
+        res.json({
+            success: true,
+            message: 'Message envoyé avec succès',
+            data: message
+        });
+    } catch (error) {
+        console.error('Erreur lors de l\'envoi du message:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Erreur lors de l\'envoi du message',
+            error: error.message
+        });
+    }
+});
 
 /**
  * @swagger
