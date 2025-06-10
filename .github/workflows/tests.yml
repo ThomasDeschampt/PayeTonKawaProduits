@@ -2,7 +2,7 @@ name: Ci_Test_Unit_Produits
 
 on:
   push:
-    branches: [dev]
+    branches: [dev,main]
   pull_request:
     branches: [main]
 
