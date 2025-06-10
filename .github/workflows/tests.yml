@@ -1,31 +1,34 @@
-name: CI_Test_PayeTonKawaProduits # Name Action 
+name: Ci_Test_Unit_Produits
 
 on:
   push:
-    branches: [main] # BrancheTrigger 
+    branches: [dev]
   pull_request:
+    branches: [main]
 
 jobs:
   test:
-    runs-on: ubuntu-latest # Utilise la dernière version d'Ubuntu pour l'environnement d'exécution
+    runs-on: ubuntu-latest
+
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      JWT_SECRET: ${{ secrets.JWT_SECRET }}
+      JWT_EXPIRE: ${{ vars.JWT_EXPIRE }}
 
     steps:
-    - name: Vérifier le code # Étape pour cloner votre dépôt
-      uses: actions/checkout@v4
+      - name: 📦 Checkout code
+        uses: actions/checkout@v3
 
-    - name: Configurer Node.js # Étape pour configurer l'environnement Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20' # Utilisez la version de Node.js que vous utilisez dans votre projet (par exemple, 18, 20, 22)
-        cache: 'npm' # Active le cache pour les dépendances npm afin d'accélérer les builds
+      - name: ⚙️ Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
 
-    - name: Installer les dépendances # Étape pour installer les packages npm
-      run: npm ci # 'npm ci' est préféré à 'npm install' dans les CI car il utilise package-lock.json pour des builds reproductibles
+      - name: 🧰 Install dependencies
+        run: npm ci
 
-    - name: Lancer les tests unitaires avec Jest
-      run: npm test
-      env:
-        NODE_ENV: test
-        JWT_SECRET: ${{ secrets.JWT_SECRET }} # Ajoutez ceci si nécessaire
-        DATABASE_URL: ${{ secrets.DATABASE_URL }} # Ajoutez ceci si nécessaire
+      - name: 🔁 Generate Prisma client
+        run: npx prisma generate
 
+      - name: 🧪 Run tests with coverage
+        run: npm test
