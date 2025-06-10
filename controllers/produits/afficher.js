@@ -1,36 +1,27 @@
-const { PrismaClient } = require("@prisma/client");
-const prisma = new PrismaClient();
+const produitService = require('../../services/produits');
 
-// Afficher un produit par id
 const afficher = async (req, res) => {
-    try {
-        const { uuid } = req.params;
-        
+  try {
+    const produit = await produitService.getProduit(req.params.id);
 
-        const produit = await prisma.produit.findUnique({
-            where: {
-                id: uuid
-            }
-        });
-
-        if (!produit) {
-            return res.status(404).json({
-                success: false,
-                message: 'Produit non trouvé'
-            });
-        }
-
-        res.json({
-            success: true,
-            data: produit
-        });
-    } catch (error) {
-        console.error('Erreur:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Erreur serveur'
-        });
+    if (!produit) {
+      return res.status(404).json({
+        success: false,
+        message: 'Produit non trouvé'
+      });
     }
-}
+
+    res.status(200).json({
+      success: true,
+      data: produit
+    });
+  } catch (error) {
+    console.error('Erreur:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Erreur serveur'
+    });
+  }
+};
 
 module.exports = afficher;

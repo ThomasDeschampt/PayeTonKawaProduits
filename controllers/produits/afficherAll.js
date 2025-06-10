@@ -1,20 +1,12 @@
-const { PrismaClient } = require("@prisma/client");
-const prisma = new PrismaClient();
+const produitService = require('../../services/produits');
 
-// Afficher tout les produits
 const afficherAll = async (req, res) => {
-
-
   try {
-    const produits = await prisma.produit.findMany({
-      orderBy: {
-        created_at: 'desc'
-      }
-    });
-    res.json({
+    const produits = await produitService.getAllProduits();
+
+    res.status(200).json({
       success: true,
-      data: produits,
-      count: produits.length
+      data: produits
     });
   } catch (error) {
     console.error('Erreur:', error);
