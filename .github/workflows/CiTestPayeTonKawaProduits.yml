@@ -38,4 +38,3 @@ jobs:
         JWT_SECRET: ${{ secrets.JWT_SECRET }}
         JWT_EXPIRE: ${{ secrets.JWT_EXPIRE }}
         PORT: 3000 # Le port peut aussi être nécessaire si vos tests démarrent un petit serveur ou simulent des appels HTTP
-        NODE_ENV: test # Définit l'environnement comme 'test' pour vos tests, ce qui peut affecter leur comportement
