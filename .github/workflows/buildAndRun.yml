@@ -34,7 +34,7 @@ jobs:
       # vous pouvez supprimer ou commenter cette étape.
       # Si vous avez un frontend (React, Vue, Angular) ou une transpilation (TypeScript),
       # cette commande est généralement `npm run build`.
-      run: npm run build
+      run: npm run dev
       # Continue sur erreur, car parfois un build peut échouer et on veut quand même essayer de lancer le service
       # continue-on-error: true
 
