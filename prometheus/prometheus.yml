@@ -5,7 +5,9 @@ global:
 scrape_configs:
   - job_name: 'api-produits'
     static_configs:
-      - targets: ['api-produits:3001']
+      - targets: 
+        - 'api-produits:3001'
+        - 'api-produits-2:3007'
     metrics_path: '/metrics'
 
   - job_name: 'rabbitmq'
