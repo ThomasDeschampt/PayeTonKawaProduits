@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 const authorized = require('../middleware/auth');
+const validateUUID = require('../middleware/uuidValidation.js');
 
 //controllers de produits
 const afficher = require('../controllers/produits/afficher.js');
@@ -11,15 +12,15 @@ const supprimer = require('../controllers/produits/supprimer');
 const modifier = require('../controllers/produits/modifier');
 
 
-router.get('/afficher/:uuid', authorized , afficher);
+router.get('/afficher/:uuid', authorized, validateUUID, afficher);
 router.get('/afficherAll', authorized, afficherAll);
 router.post('/ajouter', authorized, ajouter);
-router.put('/modifier/:uuid', authorized, modifier);
+router.put('/modifier/:uuid', authorized, validateUUID, modifier);
 router.delete('/supprimer/:uuid', authorized, supprimer);
 
 /**
  * @swagger
- * /produit/afficher/{uuid}:
+ * api/produit/afficher/{uuid}:
  *   get:
  *     summary: Afficher un produit par UUID
  *     description: Récupère les détails d'un produit spécifique en utilisant son identifiant UUID
@@ -128,7 +129,7 @@ router.delete('/supprimer/:uuid', authorized, supprimer);
 
 /**
  * @swagger
- * /produits:
+ * api/produits:
  *   get:
  *     summary: Afficher tous les produits
  *     description: Récupère la liste complète de tous les produits, triés par date de création (plus récents en premier)
@@ -241,7 +242,7 @@ router.delete('/supprimer/:uuid', authorized, supprimer);
 
 /**
  * @swagger
- * /produit:
+ * api/produit:
  *   post:
  *     summary: Ajouter un nouveau produit
  *     description: Crée un nouveau produit dans la base de données avec les informations fournies
@@ -399,7 +400,7 @@ router.delete('/supprimer/:uuid', authorized, supprimer);
 
 /**
  * @swagger
- * /produit/{id}:
+ * api/produit/{id}:
  *   put:
  *     summary: Modifier un produit existant
  *     description: Met à jour les informations d'un produit spécifique. Seuls les champs fournis seront modifiés.
@@ -557,7 +558,7 @@ router.delete('/supprimer/:uuid', authorized, supprimer);
 
 /**
  * @swagger
- * /produit/supprimer:
+ * api/produit/supprimer:
  *   delete:
  *     summary: Supprimer un produit
  *     description: Supprime définitivement un produit de la base de données en utilisant son identifiant

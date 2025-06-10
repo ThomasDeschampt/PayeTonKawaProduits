@@ -3,7 +3,6 @@ const prisma = new PrismaClient();
 
 // Ajouter un produit
 const ajouter = async (req, res) => {
-    console.log("Ajouter un produit ", req);
 
   try {
     const { nom, description, prix, stock, photo_url } = req.body;

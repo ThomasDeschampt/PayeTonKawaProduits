@@ -1,8 +1,8 @@
-name: CI Tests
+name: CI_Test_PayeTonKawaProduits # Name Action 
 
 on:
   push:
-    branches: [main, dev]
+    branches: [main] # BrancheTrigger 
   pull_request:
 
 jobs:
