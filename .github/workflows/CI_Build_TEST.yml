@@ -25,6 +25,12 @@ jobs:
     - name: 📦 Installer les dépendances npm
       run: npm ci # 'npm ci' est préféré à 'npm install' dans les CI pour des builds reproductibles et plus rapides
 
+    - name: 🛠️ Générer le client Prisma # <--- AJOUTEZ CETTE ÉTAPE !
+      run: npx prisma generate
+      env: # Les variables d'environnement sont nécessaires pour Prisma lors de la génération si votre schema.prisma les utilise (ex: DATABASE_URL)
+            DATABASE_URL: ${{ secrets.DATABASE_URL }}
+            # N'importe quelle autre variable d'env dont Prisma aurait besoin au moment de la génération (si votre schema.prisma y fait référence)
+
     - name: 🏗️ Lancer le build du projet (si applicable)
       # Cette étape est optionnelle et dépend de votre projet.
       # Si votre projet est un backend Node.js pur sans étape de compilation (pas de TypeScript, pas de frontend à compiler),
