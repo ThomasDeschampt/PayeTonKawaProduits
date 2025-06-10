@@ -24,6 +24,11 @@ const limiter = rateLimit({
 app.use(limiter);
 app.use(cors());
 app.use(express.json());
+
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'OK' });
+});
+
 app.use("/api/produits", require("./routes/produits"));
 
 setupSwagger(app);
@@ -32,6 +37,15 @@ app.use('*', (req, res) => {
   res.status(404).json({
     success: false,
     message: 'Route non trouvée'
+  });
+});
+
+app.use((err, req, res, next) => {
+  console.error('Erreur serveur:', err);
+  res.status(500).json({
+    success: false,
+    message: 'Erreur interne du serveur',
+    error: process.env.NODE_ENV === 'development' ? err.message : undefined
   });
 });
 
@@ -50,27 +64,32 @@ async function initializeRabbitMQ() {
   }
 }
 
-app.listen(PORT, async () => {
+const server = app.listen(PORT, async () => {
   console.log(`Serveur démarré sur le port ${PORT}`);
   console.log(`API disponible sur http://localhost:${PORT}/api`);
   console.log('Protection DDoS activée (100 req/15min par IP)');
 
-  await initializeRabbitMQ();
+  try {
+    await initializeRabbitMQ();
+  } catch (error) {
+    console.error('Erreur lors de l\'initialisation:', error);
+  }
+});
 
-  const jwt = require('jsonwebtoken');
-
-  const token = jwt.sign(
-    { username: 'testuser' },
-    process.env.JWT_SECRET,
-    { expiresIn: '1h' }
-  );
-
-  console.log(token);
+process.on('SIGTERM', async () => {
+  console.log('Arrêt du serveur...');
+  server.close(async () => {
+    await prisma.$disconnect();
+    await rabbitmq.close();
+    process.exit(0);
+  });
 });
 
 process.on('SIGINT', async () => {
   console.log('Arrêt du serveur...');
-  await prisma.$disconnect();
-  await rabbitmq.close();
-  process.exit(0);
+  server.close(async () => {
+    await prisma.$disconnect();
+    await rabbitmq.close();
+    process.exit(0);
+  });
 });
