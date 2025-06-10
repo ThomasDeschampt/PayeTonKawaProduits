@@ -22,9 +22,10 @@ jobs:
     - name: Installer les dépendances # Étape pour installer les packages npm
       run: npm ci # 'npm ci' est préféré à 'npm install' dans les CI car il utilise package-lock.json pour des builds reproductibles
 
-    - name: Lancer les tests unitaires avec Jest # Étape principale pour exécuter les tests
-      run: npm test # ou 'jest' si vous n'avez pas de script 'test' dans package.json
+    - name: Lancer les tests unitaires avec Jest
+      run: npm test
       env:
-        NODE_ENV: test # Définit l'environnement comme 'test' si vos tests en dépendent
-        # Si vous avez des variables d'environnement spécifiques aux tests, ajoutez-les ici
-        # MY_TEST_ENV_VAR: ${{ secrets.MY_SECRET_VAR }} # Exemple pour une variable secrète
+        NODE_ENV: test
+        JWT_SECRET: ${{ secrets.JWT_SECRET }} # Ajoutez ceci si nécessaire
+        DATABASE_URL: ${{ secrets.DATABASE_URL }} # Ajoutez ceci si nécessaire
+
