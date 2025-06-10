@@ -2,7 +2,7 @@ name: CI_Step_1_Opti_PreBuild
 
 on:
   push:
-    branches: [dev]
+    branches: [mail]
   pull_request:
     branches: [main]
   workflow_dispatch:
