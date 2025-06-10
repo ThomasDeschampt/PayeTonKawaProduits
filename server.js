@@ -28,6 +28,7 @@ app.use(metricsMiddleware);
 app.use(limiter);
 app.use(cors());
 app.use(express.json());
+app.use("/api/produits", require("./routes/produits"));
 
 app.get('/metrics', metricsRoute);
 
