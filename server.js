@@ -52,10 +52,17 @@ app.use((err, req, res, next) => {
 async function initializeRabbitMQ() {
   try {
     await rabbitmq.connect();
-    await rabbitmq.createQueue('produits');
     
-    await rabbitmq.consumeMessages('produits', (message) => {
-      console.log('Nouveau message reçu:', message);
+    await rabbitmq.listenToPort3002((message) => {
+      console.log('Message reçu du port 3002:', message);
+    });
+
+    await rabbitmq.listenToPort3003((message) => {
+      console.log('Message reçu du port 3003:', message);
+    });
+
+    await rabbitmq.listenToPort3004((message) => {
+      console.log('Message reçu du port 3004:', message);
     });
     
     console.log('RabbitMQ initialisé avec succès');
