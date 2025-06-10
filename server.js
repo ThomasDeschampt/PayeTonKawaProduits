@@ -3,13 +3,13 @@ const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 const setupSwagger = require('./swagger');
 const { PrismaClient } = require('@prisma/client');
+const rabbitmq = require('./services/rabbitmq');
 require('dotenv').config();
 
 const app = express();
 const prisma = new PrismaClient();
 const PORT = process.env.PORT || 3000;
 
-// Protection DDoS - Limitation du taux de requêtes
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100,
@@ -35,14 +35,30 @@ app.use('*', (req, res) => {
   });
 });
 
-app.listen(PORT, () => {
+async function initializeRabbitMQ() {
+  try {
+    await rabbitmq.connect();
+    await rabbitmq.createQueue('produits');
+    
+    await rabbitmq.consumeMessages('produits', (message) => {
+      console.log('Nouveau message reçu:', message);
+    });
+    
+    console.log('RabbitMQ initialisé avec succès');
+  } catch (error) {
+    console.error('Erreur lors de l\'initialisation de RabbitMQ:', error);
+  }
+}
+
+app.listen(PORT, async () => {
   console.log(`Serveur démarré sur le port ${PORT}`);
   console.log(`API disponible sur http://localhost:${PORT}/api`);
   console.log('Protection DDoS activée (100 req/15min par IP)');
 
+  await initializeRabbitMQ();
+
   const jwt = require('jsonwebtoken');
 
-  //temporaire
   const token = jwt.sign(
     { username: 'testuser' },
     process.env.JWT_SECRET,
@@ -55,5 +71,6 @@ app.listen(PORT, () => {
 process.on('SIGINT', async () => {
   console.log('Arrêt du serveur...');
   await prisma.$disconnect();
+  await rabbitmq.close();
   process.exit(0);
 });
