@@ -2,8 +2,8 @@ const amqp = require('amqplib');
 require('dotenv').config();
 
 const RABBITMQ_URL = process.env.RABBITMQ_URL || 'amqp://admin:admin@localhost:5672';
-const MAX_RETRIES = 5;
-const RETRY_DELAY = 2000;
+const MAX_RETRIES = 3;
+const RETRY_DELAY = 1000;
 
 class RabbitMQService {
     constructor() {
@@ -14,10 +14,17 @@ class RabbitMQService {
             port3003: 'queue_port_3003',
             port3004: 'queue_port_3004'
         };
+        this.isConnecting = false;
         console.log('Service RabbitMQ initialisé avec URL:', RABBITMQ_URL);
     }
 
     async connect() {
+        if (this.isConnecting) {
+            console.log('Une tentative de connexion est déjà en cours...');
+            return;
+        }
+
+        this.isConnecting = true;
         let retries = 0;
         
         while (retries < MAX_RETRIES) {
@@ -25,7 +32,10 @@ class RabbitMQService {
                 console.log(`Tentative de connexion à RabbitMQ (${retries + 1}/${MAX_RETRIES})...`);
                 console.log('URL de connexion:', RABBITMQ_URL);
                 
-                this.connection = await amqp.connect(RABBITMQ_URL);
+                this.connection = await amqp.connect(RABBITMQ_URL, {
+                    heartbeat: 30,
+                    timeout: 5000
+                });
                 console.log('Connexion AMQP établie');
                 
                 this.connection.on('error', (err) => {
@@ -41,20 +51,25 @@ class RabbitMQService {
                 this.channel = await this.connection.createChannel();
                 console.log('Canal RabbitMQ créé');
 
+                await this.channel.prefetch(1);
+                
                 for (const queue of Object.values(this.queues)) {
-                    await this.channel.assertQueue(queue, {
-                        durable: true
-                    });
-                    console.log(`Queue ${queue} déclarée`);
+                    try {
+                        await this.channel.checkQueue(queue);
+                    } catch {
+                        await this.channel.assertQueue(queue, { durable: true });
+                    }
                 }
 
                 console.log('Connexion à RabbitMQ établie avec succès');
+                this.isConnecting = false;
                 return;
             } catch (error) {
                 retries++;
                 console.error(`Échec de la connexion à RabbitMQ (tentative ${retries}/${MAX_RETRIES}):`, error.message);
                 
                 if (retries === MAX_RETRIES) {
+                    this.isConnecting = false;
                     throw new Error(`Impossible de se connecter à RabbitMQ après ${MAX_RETRIES} tentatives`);
                 }
                 

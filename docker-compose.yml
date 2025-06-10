@@ -32,7 +32,7 @@ services:
       - "prometheus.io/path=/metrics"
 
   rabbitmq:
-    image: rabbitmq:3-management
+    image: rabbitmq:3-management-alpine
     hostname: rabbitmq
     ports:
       - "5672:5672"   
@@ -40,16 +40,17 @@ services:
     environment:
       - RABBITMQ_DEFAULT_USER=admin
       - RABBITMQ_DEFAULT_PASS=admin
+      - RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS=-rabbitmq_management listener [{port,15672},{ssl,false}]
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
     networks:
       - app-network
     healthcheck:
       test: ["CMD", "rabbitmq-diagnostics", "check_port_connectivity"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 30s
+      interval: 5s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
     labels:
       - "prometheus.io/scrape=true"
       - "prometheus.io/port=15692"

@@ -48,24 +48,41 @@ app.use('*', (req, res) => {
 app.use(errorHandler);
 
 async function initializeRabbitMQ() {
-    try {
-        await rabbitmq.connect();
-        
-        await rabbitmq.listenToPort3002((message) => {
-            console.log('Message reçu du port 3002:', message);
-        });
+    let retries = 0;
+    const maxRetries = 3;
+    const retryDelay = 5000;
 
-        await rabbitmq.listenToPort3003((message) => {
-            console.log('Message reçu du port 3003:', message);
-        });
+    while (retries < maxRetries) {
+        try {
+            console.log(`Tentative d'initialisation de RabbitMQ (${retries + 1}/${maxRetries})...`);
+            await rabbitmq.connect();
+            
+            await rabbitmq.listenToPort3002((message) => {
+                console.log('Message reçu du port 3002:', message);
+            });
 
-        await rabbitmq.listenToPort3004((message) => {
-            console.log('Message reçu du port 3004:', message);
-        });
-        
-        console.log('RabbitMQ initialisé avec succès');
-    } catch (error) {
-        console.error('Erreur lors de l\'initialisation de RabbitMQ:', error);
+            await rabbitmq.listenToPort3003((message) => {
+                console.log('Message reçu du port 3003:', message);
+            });
+
+            await rabbitmq.listenToPort3004((message) => {
+                console.log('Message reçu du port 3004:', message);
+            });
+            
+            console.log('RabbitMQ initialisé avec succès');
+            return;
+        } catch (error) {
+            retries++;
+            console.error(`Échec de l'initialisation de RabbitMQ (tentative ${retries}/${maxRetries}):`, error.message);
+            
+            if (retries === maxRetries) {
+                console.error('Impossible d\'initialiser RabbitMQ après plusieurs tentatives. Le service continuera sans RabbitMQ.');
+                return;
+            }
+            
+            console.log(`Nouvelle tentative dans ${retryDelay/1000} secondes...`);
+            await new Promise(resolve => setTimeout(resolve, retryDelay));
+        }
     }
 }
 
