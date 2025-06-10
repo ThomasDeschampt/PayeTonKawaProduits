@@ -2,7 +2,7 @@
 
 Service de gestion des produits pour l'application PayeTonKawa.
 
-## 🚀 Fonctionnalités
+## Fonctionnalités
 
 - Gestion complète des produits (CRUD)
 - API RESTful documentée avec Swagger
@@ -11,7 +11,7 @@ Service de gestion des produits pour l'application PayeTonKawa.
 - Protection contre les attaques DDoS
 - Tests automatisés
 
-## 📋 Prérequis
+## Prérequis
 
 - Node.js (v14 ou supérieur)
 - Docker et Docker Compose
@@ -42,7 +42,7 @@ cp .env.example .env
 docker-compose up -d
 ```
 
-## 🏃‍♂️ Démarrage
+## Démarrage
 
 ### Développement
 ```bash
@@ -54,11 +54,11 @@ npm run dev
 npm start
 ```
 
-## 📚 Documentation API
+## Documentation API
 
 La documentation Swagger est disponible à l'adresse : `http://localhost:3007/api-docs`
 
-## 🧪 Tests
+## Tests
 
 ```bash
 # Tests unitaires
@@ -68,26 +68,14 @@ npm run test
 npm run test:coverage
 ```
 
-## 📊 Monitoring
+## Monitoring
 
-- Métriques Prometheus : `http://localhost:3007/metrics`
-- Dashboard Grafana : `http://localhost:3000`
+- Métriques Prometheus : `http://localhost:9090`
+- Dashboard Grafana : `http://localhost:7070`
 
-## 🔐 Sécurité
+## Sécurité
 
 - Rate limiting : 100 requêtes par IP toutes les 15 minutes
 - Validation des données
 - Protection CORS
 - Gestion des erreurs sécurisée
-
-## 🤝 Contribution
-
-1. Fork le projet
-2. Créer une branche (`git checkout -b feature/AmazingFeature`)
-3. Commit les changements (`git commit -m 'Add some AmazingFeature'`)
-4. Push sur la branche (`git push origin feature/AmazingFeature`)
-5. Ouvrir une Pull Request
-
-## 📝 License
-
-Ce projet est sous licence MIT. Voir le fichier `LICENSE` pour plus de détails.
