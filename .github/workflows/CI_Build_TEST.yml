@@ -15,8 +15,15 @@ jobs:
     steps:
     - name: 🚀 Cloner le code du dépôt
       uses: actions/checkout@v4 # Action pour récupérer votre code depuis GitHub
-    - name: 🔍 Afficher les variables d’environnement
-      run: printenv | sort
+    - name: 🔍 DEBUG TEMP — Voir les variables d’environnement
+      run: |
+        echo "✅ JWT_EXPIRE: $JWT_EXPIRE"
+        echo "✅ DATABASE_URL set: ${DATABASE_URL:+yes}"
+        echo "✅ JWT_SECRET set: ${JWT_SECRET:+yes}"
+      env:
+        JWT_EXPIRE: ${{ vars.JWT_EXPIRE }}
+        DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        JWT_SECRET: ${{ secrets.JWT_SECRET }}
 
     - name: ⚙️ Configurer l'environnement Node.js
       uses: actions/setup-node@v4 # Action pour installer Node.js
