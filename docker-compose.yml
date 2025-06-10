@@ -7,7 +7,7 @@ services:
       - "3001:3001"
     environment:
       - NODE_ENV=development
-      - DATABASE_URL=${DATABASE_URL}
+      - DATABASE_URL=process.env.DATABASE_URL
       - RABBITMQ_URL=amqp://admin:admin@rabbitmq:5672
       - DEBUG=*
       - PORT=3001
