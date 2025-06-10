@@ -2,7 +2,8 @@ const produitService = require('../../services/produits');
 
 const modifier = async (req, res) => {
   try {
-    const produit = await produitService.updateProduit(req.params.id, req.body);
+    const { uuid } = req.params;
+    const produit = await produitService.updateProduit(uuid, req.body);
 
     if (!produit) {
       return res.status(404).json({

@@ -2,7 +2,8 @@ const produitService = require('../../services/produits');
 
 const supprimer = async (req, res) => {
   try {
-    const produit = await produitService.deleteProduit(req.params.id);
+    const { uuid } = req.params;
+    const produit = await produitService.deleteProduit(uuid);
 
     if (!produit) {
       return res.status(404).json({

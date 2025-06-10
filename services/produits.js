@@ -20,21 +20,25 @@ class ProduitService {
     });
   }
 
-  async getProduit(id) {
+  async getProduit(uuid) {
     return await prisma.produit.findUnique({
-      where: { id: parseInt(id) }
+      where: { id: uuid }
     });
   }
 
   async getAllProduits() {
-    return await prisma.produit.findMany();
+    return await prisma.produit.findMany({
+      orderBy: {
+        created_at: 'desc'
+      }
+    });
   }
 
-  async updateProduit(id, produitData) {
+  async updateProduit(uuid, produitData) {
     const { nom, description, prix, stock, photo_url } = produitData;
 
     return await prisma.produit.update({
-      where: { id: parseInt(id) },
+      where: { id: uuid },
       data: {
         nom,
         description,
@@ -45,9 +49,9 @@ class ProduitService {
     });
   }
 
-  async deleteProduit(id) {
+  async deleteProduit(uuid) {
     return await prisma.produit.delete({
-      where: { id: parseInt(id) }
+      where: { id: uuid }
     });
   }
 }
