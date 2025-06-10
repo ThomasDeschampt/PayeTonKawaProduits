@@ -1,20 +1,10 @@
 const ajouter = require('../../controllers/produits/ajouter');
-const { PrismaClient } = require('@prisma/client');
+const produitService = require('../../services/produits');
 
-// Mock de Prisma Client
-jest.mock('@prisma/client', () => {
-  const mockPrismaClient = {
-    produit: {
-      create: jest.fn(),
-    },
-    $disconnect: jest.fn(),
-  };
-  return {
-    PrismaClient: jest.fn(() => mockPrismaClient),
-  };
-});
-
-const prisma = new PrismaClient();
+// Mock du service produit au lieu de Prisma directement
+jest.mock('../../services/produits', () => ({
+  createProduit: jest.fn(),
+}));
 
 describe('ajouter Controller', () => {
   let req, res;
@@ -60,25 +50,13 @@ describe('ajouter Controller', () => {
       };
 
       // Configuration du mock
-      prisma.produit.create.mockResolvedValue(mockNouveauProduit);
-
-      const consoleLogSpy = jest.spyOn(console, 'log').mockImplementation();
+      produitService.createProduit.mockResolvedValue(mockNouveauProduit);
 
       // Exécution de la fonction
       await ajouter(req, res);
 
       // Vérifications
-      expect(consoleLogSpy).toHaveBeenCalledWith("Ajouter un produit ", req);
-
-      expect(prisma.produit.create).toHaveBeenCalledWith({
-        data: {
-          nom: 'Produit Test',
-          description: 'Description du produit test',
-          prix: 25.99,
-          stock: 10,
-          photo_url: 'http://example.com/photo.jpg'
-        }
-      });
+      expect(produitService.createProduit).toHaveBeenCalledWith(req.body);
 
       expect(res.status).toHaveBeenCalledWith(201);
       expect(res.json).toHaveBeenCalledWith({
@@ -86,8 +64,6 @@ describe('ajouter Controller', () => {
         data: mockNouveauProduit,
         message: 'Produit créé avec succès'
       });
-
-      consoleLogSpy.mockRestore();
     });
 
     it('devrait créer un produit avec seulement nom et prix', async () => {
@@ -106,21 +82,11 @@ describe('ajouter Controller', () => {
         created_at: new Date('2024-01-01')
       };
 
-      prisma.produit.create.mockResolvedValue(mockNouveauProduit);
-
-      const consoleLogSpy = jest.spyOn(console, 'log').mockImplementation();
+      produitService.createProduit.mockResolvedValue(mockNouveauProduit);
 
       await ajouter(req, res);
 
-      expect(prisma.produit.create).toHaveBeenCalledWith({
-        data: {
-          nom: 'Produit Minimal',
-          description: null,
-          prix: 15.50,
-          stock: 0,
-          photo_url: 'http://example.com/photo.jpg'
-        }
-      });
+      expect(produitService.createProduit).toHaveBeenCalledWith(req.body);
 
       expect(res.status).toHaveBeenCalledWith(201);
       expect(res.json).toHaveBeenCalledWith({
@@ -128,8 +94,6 @@ describe('ajouter Controller', () => {
         data: mockNouveauProduit,
         message: 'Produit créé avec succès'
       });
-
-      consoleLogSpy.mockRestore();
     });
 
     it('devrait gérer description vide et stock par défaut', async () => {
@@ -150,23 +114,11 @@ describe('ajouter Controller', () => {
         photo_url: 'http://example.com/photo.jpg'
       };
 
-      prisma.produit.create.mockResolvedValue(mockNouveauProduit);
-
-      const consoleLogSpy = jest.spyOn(console, 'log').mockImplementation();
+      produitService.createProduit.mockResolvedValue(mockNouveauProduit);
 
       await ajouter(req, res);
 
-      expect(prisma.produit.create).toHaveBeenCalledWith({
-        data: {
-          nom: 'Produit Sans Description',
-          description: null, // '' || null = null
-          prix: 99.99,
-          stock: 0, // parseInt('') || 0 = 0
-          photo_url: 'http://example.com/photo.jpg'
-        }
-      });
-
-      consoleLogSpy.mockRestore();
+      expect(produitService.createProduit).toHaveBeenCalledWith(req.body);
     });
 
     it('devrait convertir correctement les types numériques', async () => {
@@ -186,23 +138,11 @@ describe('ajouter Controller', () => {
         photo_url: 'http://example.com/photo.jpg'
       };
 
-      prisma.produit.create.mockResolvedValue(mockNouveauProduit);
-
-      const consoleLogSpy = jest.spyOn(console, 'log').mockImplementation();
+      produitService.createProduit.mockResolvedValue(mockNouveauProduit);
 
       await ajouter(req, res);
 
-      expect(prisma.produit.create).toHaveBeenCalledWith({
-        data: {
-          nom: 'Produit Conversion',
-          description: null,
-          prix: 123.456,
-          stock: 25,
-          photo_url: 'http://example.com/photo.jpg'
-        }
-      });
-
-      consoleLogSpy.mockRestore();
+      expect(produitService.createProduit).toHaveBeenCalledWith(req.body);
     });
   });
 
@@ -213,7 +153,8 @@ describe('ajouter Controller', () => {
         description: 'Test',
       };
 
-      const consoleLogSpy = jest.spyOn(console, 'log').mockImplementation();
+      // Le service doit lever une erreur de validation
+      produitService.createProduit.mockRejectedValue(new Error('Le nom et le prix sont requis'));
 
       await ajouter(req, res);
 
@@ -223,9 +164,7 @@ describe('ajouter Controller', () => {
         message: 'Le nom et le prix sont requis'
       });
 
-      expect(prisma.produit.create).not.toHaveBeenCalled();
-
-      consoleLogSpy.mockRestore();
+      expect(produitService.createProduit).toHaveBeenCalledWith(req.body);
     });
 
     it('devrait retourner une erreur si le prix est manquant', async () => {
@@ -234,7 +173,7 @@ describe('ajouter Controller', () => {
         description: 'Test'
       };
 
-      const consoleLogSpy = jest.spyOn(console, 'log').mockImplementation();
+      produitService.createProduit.mockRejectedValue(new Error('Le nom et le prix sont requis'));
 
       await ajouter(req, res);
 
@@ -244,9 +183,7 @@ describe('ajouter Controller', () => {
         message: 'Le nom et le prix sont requis'
       });
 
-      expect(prisma.produit.create).not.toHaveBeenCalled();
-
-      consoleLogSpy.mockRestore();
+      expect(produitService.createProduit).toHaveBeenCalledWith(req.body);
     });
 
     it('devrait retourner une erreur si le nom est une chaîne vide', async () => {
@@ -255,7 +192,7 @@ describe('ajouter Controller', () => {
         prix: '25.99'
       };
 
-      const consoleLogSpy = jest.spyOn(console, 'log').mockImplementation();
+      produitService.createProduit.mockRejectedValue(new Error('Le nom et le prix sont requis'));
 
       await ajouter(req, res);
 
@@ -265,9 +202,7 @@ describe('ajouter Controller', () => {
         message: 'Le nom et le prix sont requis'
       });
 
-      expect(prisma.produit.create).not.toHaveBeenCalled();
-
-      consoleLogSpy.mockRestore();
+      expect(produitService.createProduit).toHaveBeenCalledWith(req.body);
     });
 
     it('devrait accepter un prix de 0 en string', async () => {
@@ -285,25 +220,13 @@ describe('ajouter Controller', () => {
         photo_url: null
       };
 
-      prisma.produit.create.mockResolvedValue(mockNouveauProduit);
-
-      const consoleLogSpy = jest.spyOn(console, 'log').mockImplementation();
+      produitService.createProduit.mockResolvedValue(mockNouveauProduit);
 
       await ajouter(req, res);
 
-      expect(prisma.produit.create).toHaveBeenCalledWith({
-        data: {
-          nom: 'Produit Gratuit',
-          description: null,
-          prix: 0,
-          stock: 0,
-          photo_url: null
-        }
-      });
+      expect(produitService.createProduit).toHaveBeenCalledWith(req.body);
 
       expect(res.status).toHaveBeenCalledWith(201);
-
-      consoleLogSpy.mockRestore();
     });
   });
 
@@ -315,9 +238,8 @@ describe('ajouter Controller', () => {
       };
 
       const mockError = new Error('Erreur de contrainte unique');
-      prisma.produit.create.mockRejectedValue(mockError);
+      produitService.createProduit.mockRejectedValue(mockError);
 
-      const consoleLogSpy = jest.spyOn(console, 'log').mockImplementation();
       const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
 
       await ajouter(req, res);
@@ -327,10 +249,9 @@ describe('ajouter Controller', () => {
       expect(res.status).toHaveBeenCalledWith(500);
       expect(res.json).toHaveBeenCalledWith({
         success: false,
-        message: 'Erreur serveur'
+        message: 'Erreur de contrainte unique'
       });
 
-      consoleLogSpy.mockRestore();
       consoleErrorSpy.mockRestore();
     });
 
@@ -346,9 +267,8 @@ describe('ajouter Controller', () => {
         meta: { target: ['nom'] }
       };
 
-      prisma.produit.create.mockRejectedValue(prismaError);
+      produitService.createProduit.mockRejectedValue(prismaError);
 
-      const consoleLogSpy = jest.spyOn(console, 'log').mockImplementation();
       const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
 
       await ajouter(req, res);
@@ -356,13 +276,34 @@ describe('ajouter Controller', () => {
       expect(consoleErrorSpy).toHaveBeenCalledWith('Erreur:', prismaError);
       expect(res.status).toHaveBeenCalledWith(500);
 
-      consoleLogSpy.mockRestore();
+      consoleErrorSpy.mockRestore();
+    });
+
+    it('devrait gérer les erreurs sans message spécifique', async () => {
+      req.body = {
+        nom: 'Produit Test',
+        prix: '25.99'
+      };
+
+      const errorWithoutMessage = {};
+      produitService.createProduit.mockRejectedValue(errorWithoutMessage);
+
+      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
+
+      await ajouter(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(500);
+      expect(res.json).toHaveBeenCalledWith({
+        success: false,
+        message: 'Erreur serveur'
+      });
+
       consoleErrorSpy.mockRestore();
     });
   });
 
   describe('Vérifications des appels', () => {
-    it('devrait appeler create avec les bons paramètres', async () => {
+    it('devrait appeler createProduit avec les bons paramètres', async () => {
       req.body = {
         nom: 'Test Appel',
         description: 'Description test',
@@ -371,143 +312,67 @@ describe('ajouter Controller', () => {
       };
 
       const mockProduit = { id: 6, nom: 'Test Appel' };
-      prisma.produit.create.mockResolvedValue(mockProduit);
-
-      const consoleLogSpy = jest.spyOn(console, 'log').mockImplementation();
+      produitService.createProduit.mockResolvedValue(mockProduit);
 
       await ajouter(req, res);
 
-      expect(prisma.produit.create).toHaveBeenCalledTimes(1);
-      expect(prisma.produit.create).toHaveBeenCalledWith({
-        data: {
-          nom: 'Test Appel',
-          description: 'Description test',
-          prix: 50.00,
-          stock: 5,
-          photo_url: null
-        }
-      });
-
-      consoleLogSpy.mockRestore();
+      expect(produitService.createProduit).toHaveBeenCalledTimes(1);
+      expect(produitService.createProduit).toHaveBeenCalledWith(req.body);
     });
 
-    it('ne devrait pas appeler create si la validation échoue', async () => {
+    it('devrait appeler createProduit même si la validation échoue', async () => {
       req.body = {
         description: 'Sans nom ni prix'
       };
 
-      const consoleLogSpy = jest.spyOn(console, 'log').mockImplementation();
+      produitService.createProduit.mockRejectedValue(new Error('Le nom et le prix sont requis'));
 
       await ajouter(req, res);
 
-      expect(prisma.produit.create).not.toHaveBeenCalled();
+      expect(produitService.createProduit).toHaveBeenCalledWith(req.body);
       expect(res.status).toHaveBeenCalledWith(400);
-
-      consoleLogSpy.mockRestore();
     });
   });
 
-  describe('Gestion des types de données', () => {
-    it('devrait gérer les valeurs NaN pour le stock', async () => {
+  describe('Gestion des statuts de réponse', () => {
+    it('devrait retourner 400 pour une erreur de validation', async () => {
       req.body = {
-        nom: 'Produit NaN',
-        prix: '15.99',
-        stock: 'abc' // parseInt('abc') = NaN
+        nom: '',
+        prix: ''
       };
 
-      const mockProduit = {
-        id: 7,
-        nom: 'Produit NaN',
-        prix: 15.99,
-        stock: 0
-      };
-
-      prisma.produit.create.mockResolvedValue(mockProduit);
-
-      const consoleLogSpy = jest.spyOn(console, 'log').mockImplementation();
+      produitService.createProduit.mockRejectedValue(new Error('Le nom et le prix sont requis'));
 
       await ajouter(req, res);
 
-      expect(prisma.produit.create).toHaveBeenCalledWith({
-        data: {
-          nom: 'Produit NaN',
-          description: null,
-          prix: 15.99,
-          stock: 0, // parseInt('abc') || 0 = 0
-          photo_url: null
-        }
-      });
-
-      consoleLogSpy.mockRestore();
+      expect(res.status).toHaveBeenCalledWith(400);
     });
 
-    it('devrait gérer les prix décimaux avec plusieurs décimales', async () => {
+    it('devrait retourner 500 pour une erreur serveur générique', async () => {
       req.body = {
-        nom: 'Produit Précis',
-        prix: '19.999999'
+        nom: 'Produit Test',
+        prix: '25.99'
       };
 
-      const mockProduit = {
-        id: 8,
-        nom: 'Produit Précis',
-        prix: 19.999999
-      };
-
-      prisma.produit.create.mockResolvedValue(mockProduit);
-
-      const consoleLogSpy = jest.spyOn(console, 'log').mockImplementation();
+      produitService.createProduit.mockRejectedValue(new Error('Erreur de base de données'));
 
       await ajouter(req, res);
 
-      expect(prisma.produit.create).toHaveBeenCalledWith({
-        data: {
-          nom: 'Produit Précis',
-          description: null,
-          prix: 19.999999,
-          stock: 0,
-          photo_url: null
-        }
-      });
-
-      consoleLogSpy.mockRestore();
+      expect(res.status).toHaveBeenCalledWith(500);
     });
 
-    it('devrait gérer les stocks négatifs', async () => {
+    it('devrait retourner 201 en cas de succès', async () => {
       req.body = {
-        nom: 'Produit Négatif',
-        prix: '10.00',
-        stock: '-5',
-        description: null,
-        photo_url: null
+        nom: 'Produit Succès',
+        prix: '15.99'
       };
 
-      const mockProduit = {
-        id: 9,
-        nom: 'Produit Négatif',
-        prix: 10.00,
-        stock: -5,
-        description: null,
-        photo_url: null
-      };
-
-      prisma.produit.create.mockResolvedValue(mockProduit);
-
-      const consoleLogSpy = jest.spyOn(console, 'log').mockImplementation();
+      const mockProduit = { id: 1, nom: 'Produit Succès' };
+      produitService.createProduit.mockResolvedValue(mockProduit);
 
       await ajouter(req, res);
 
-      expect(prisma.produit.create).toHaveBeenCalledWith({
-        data: {
-          nom: 'Produit Négatif',
-          description: null,
-          prix: 10.00,
-          stock: -5,
-          photo_url: null
-
-        }
-      });
-
-      consoleLogSpy.mockRestore();
+      expect(res.status).toHaveBeenCalledWith(201);
     });
   });
 });

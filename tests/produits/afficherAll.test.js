@@ -1,20 +1,10 @@
 const afficherAll = require('../../controllers/produits/afficherAll');
-const { PrismaClient } = require('@prisma/client');
+const produitService = require('../../services/produits');
 
-// Mock de Prisma Client
-jest.mock('@prisma/client', () => {
-  const mockPrismaClient = {
-    produit: {  // Correction: "produit" au lieu de "produits"
-      findMany: jest.fn(),
-    },
-    $disconnect: jest.fn(),
-  };
-  return {
-    PrismaClient: jest.fn(() => mockPrismaClient),
-  };
-});
-
-const prisma = new PrismaClient();
+// Mock du service produit au lieu de Prisma directement
+jest.mock('../../services/produits', () => ({
+  getAllProduits: jest.fn(),
+}));
 
 describe('afficherAll Controller', () => {
   let req, res;
@@ -53,55 +43,47 @@ describe('afficherAll Controller', () => {
         }
       ];
 
-      // Configuration du mock
-      prisma.produit.findMany.mockResolvedValue(mockProduits);
+      // Configuration du mock du service
+      produitService.getAllProduits.mockResolvedValue(mockProduits);
 
       // Exécution de la fonction
       await afficherAll(req, res);
 
       // Vérifications
-      expect(prisma.produit.findMany).toHaveBeenCalledWith({
-        orderBy: {
-          created_at: 'desc'
-        }
-      });
+      expect(produitService.getAllProduits).toHaveBeenCalledTimes(1);
+      expect(produitService.getAllProduits).toHaveBeenCalledWith();
 
+      expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith({
         success: true,
-        data: mockProduits,
-        count: mockProduits.length
+        data: mockProduits
       });
-
-      expect(res.status).not.toHaveBeenCalled();
     });
 
     it('devrait retourner un tableau vide si aucun produit n\'existe', async () => {
       // Configuration du mock pour un tableau vide
-      prisma.produit.findMany.mockResolvedValue([]);
+      produitService.getAllProduits.mockResolvedValue([]);
 
       // Exécution de la fonction
       await afficherAll(req, res);
 
       // Vérifications
-      expect(prisma.produit.findMany).toHaveBeenCalledWith({
-        orderBy: {
-          created_at: 'desc'
-        }
-      });
+      expect(produitService.getAllProduits).toHaveBeenCalledTimes(1);
+      expect(produitService.getAllProduits).toHaveBeenCalledWith();
 
+      expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith({
         success: true,
-        data: [],
-        count: 0
+        data: []
       });
     });
   });
 
   describe('Cas d\'erreur', () => {
-    it('devrait gérer les erreurs de base de données', async () => {
+    it('devrait gérer les erreurs de service', async () => {
       // Configuration du mock pour simuler une erreur
       const mockError = new Error('Erreur de connexion à la base de données');
-      prisma.produit.findMany.mockRejectedValue(mockError);
+      produitService.getAllProduits.mockRejectedValue(mockError);
 
       // Mock de console.error pour éviter l'affichage dans les tests
       const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
@@ -110,12 +92,7 @@ describe('afficherAll Controller', () => {
       await afficherAll(req, res);
 
       // Vérifications
-      expect(prisma.produit.findMany).toHaveBeenCalledWith({
-        orderBy: {
-          created_at: 'desc'
-        }
-      });
-
+      expect(produitService.getAllProduits).toHaveBeenCalledTimes(1);
       expect(consoleSpy).toHaveBeenCalledWith('Erreur:', mockError);
 
       expect(res.status).toHaveBeenCalledWith(500);
@@ -128,13 +105,10 @@ describe('afficherAll Controller', () => {
       consoleSpy.mockRestore();
     });
 
-    it('devrait gérer les erreurs Prisma spécifiques', async () => {
-      // Simulation d'une erreur Prisma
-      const prismaError = {
-        code: 'P2002',
-        message: 'Erreur Prisma spécifique'
-      };
-      prisma.produit.findMany.mockRejectedValue(prismaError);
+    it('devrait gérer les erreurs génériques', async () => {
+      // Simulation d'une erreur générique
+      const genericError = new Error('Erreur inattendue');
+      produitService.getAllProduits.mockRejectedValue(genericError);
 
       const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
 
@@ -142,7 +116,7 @@ describe('afficherAll Controller', () => {
       await afficherAll(req, res);
 
       // Vérifications
-      expect(consoleSpy).toHaveBeenCalledWith('Erreur:', prismaError);
+      expect(consoleSpy).toHaveBeenCalledWith('Erreur:', genericError);
       expect(res.status).toHaveBeenCalledWith(500);
       expect(res.json).toHaveBeenCalledWith({
         success: false,
@@ -154,25 +128,21 @@ describe('afficherAll Controller', () => {
   });
 
   describe('Vérifications des appels', () => {
-    it('devrait appeler findMany avec les bons paramètres', async () => {
-      prisma.produit.findMany.mockResolvedValue([]);
+    it('devrait appeler le service avec les bons paramètres', async () => {
+      produitService.getAllProduits.mockResolvedValue([]);
 
       await afficherAll(req, res);
 
-      expect(prisma.produit.findMany).toHaveBeenCalledTimes(1);
-      expect(prisma.produit.findMany).toHaveBeenCalledWith({
-        orderBy: {
-          created_at: 'desc'
-        }
-      });
+      expect(produitService.getAllProduits).toHaveBeenCalledTimes(1);
+      expect(produitService.getAllProduits).toHaveBeenCalledWith();
     });
 
-    it('ne devrait pas appeler res.status en cas de succès', async () => {
-      prisma.produit.findMany.mockResolvedValue([]);
+    it('devrait appeler res.status et res.json en cas de succès', async () => {
+      produitService.getAllProduits.mockResolvedValue([]);
 
       await afficherAll(req, res);
 
-      expect(res.status).not.toHaveBeenCalled();
+      expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledTimes(1);
     });
   });
