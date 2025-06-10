@@ -18,7 +18,7 @@ jest.mock('@prisma/client', () => {
 const prisma = new PrismaClient();
 
 describe('supprimer Controller', () => {
-  let req, res;
+  let req, res, next;
 
   beforeEach(() => {
     req = {
@@ -28,6 +28,7 @@ describe('supprimer Controller', () => {
       json: jest.fn(),
       status: jest.fn().mockReturnThis(),
     };
+    next = jest.fn();
 
     jest.clearAllMocks();
   });
@@ -42,16 +43,17 @@ describe('supprimer Controller', () => {
       prisma.produit.findUnique.mockResolvedValue(produitMock);
       prisma.produit.delete.mockResolvedValue(produitMock);
 
-      await supprimer(req, res);
+      await supprimer(req, res, next);
 
       expect(prisma.produit.findUnique).toHaveBeenCalledWith({ where: { id: uuid } });
       expect(prisma.produit.delete).toHaveBeenCalledWith({ where: { id: uuid } });
 
+      expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith({
         success: true,
         message: 'Produit supprimé avec succès'
       });
-      expect(res.status).not.toHaveBeenCalled();
+      expect(next).not.toHaveBeenCalled();
     });
   });
 
@@ -62,15 +64,13 @@ describe('supprimer Controller', () => {
 
       prisma.produit.findUnique.mockResolvedValue(null);
 
-      await supprimer(req, res);
+      await supprimer(req, res, next);
 
       expect(prisma.produit.findUnique).toHaveBeenCalledWith({ where: { id: uuid } });
       expect(prisma.produit.delete).not.toHaveBeenCalled();
-      expect(res.status).toHaveBeenCalledWith(404);
-      expect(res.json).toHaveBeenCalledWith({
-        success: false,
-        message: 'Produit non trouvé'
-      });
+      expect(next).toHaveBeenCalledWith(expect.any(Error));
+      expect(res.status).not.toHaveBeenCalled();
+      expect(res.json).not.toHaveBeenCalled();
     });
   });
 
@@ -82,18 +82,11 @@ describe('supprimer Controller', () => {
       req.params = { uuid };
       prisma.produit.findUnique.mockRejectedValue(mockError);
 
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+      await supprimer(req, res, next);
 
-      await supprimer(req, res);
-
-      expect(consoleSpy).toHaveBeenCalledWith("Erreur:", mockError);
-      expect(res.status).toHaveBeenCalledWith(500);
-      expect(res.json).toHaveBeenCalledWith({
-        success: false,
-        message: 'Erreur serveur'
-      });
-
-      consoleSpy.mockRestore();
+      expect(next).toHaveBeenCalledWith(mockError);
+      expect(res.status).not.toHaveBeenCalled();
+      expect(res.json).not.toHaveBeenCalled();
     });
 
     it('gère les erreurs lors du delete', async () => {
@@ -106,18 +99,11 @@ describe('supprimer Controller', () => {
       prisma.produit.findUnique.mockResolvedValue(produitMock);
       prisma.produit.delete.mockRejectedValue(mockError);
 
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+      await supprimer(req, res, next);
 
-      await supprimer(req, res);
-
-      expect(consoleSpy).toHaveBeenCalledWith("Erreur:", mockError);
-      expect(res.status).toHaveBeenCalledWith(500);
-      expect(res.json).toHaveBeenCalledWith({
-        success: false,
-        message: 'Erreur serveur'
-      });
-
-      consoleSpy.mockRestore();
+      expect(next).toHaveBeenCalledWith(mockError);
+      expect(res.status).not.toHaveBeenCalled();
+      expect(res.json).not.toHaveBeenCalled();
     });
   });
 
@@ -125,10 +111,12 @@ describe('supprimer Controller', () => {
     it('ne fait rien si uuid est manquant', async () => {
       req.params = {}; // uuid manquant
 
-      await supprimer(req, res);
+      await supprimer(req, res, next);
 
-      // Erreur probable avec `undefined`, doit être gérée
       expect(prisma.produit.findUnique).toHaveBeenCalledWith({ where: { id: undefined } });
+      expect(next).toHaveBeenCalledWith(expect.any(Error));
+      expect(res.status).not.toHaveBeenCalled();
+      expect(res.json).not.toHaveBeenCalled();
     });
   });
 });

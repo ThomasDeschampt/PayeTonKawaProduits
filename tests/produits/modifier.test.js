@@ -18,7 +18,7 @@ jest.mock('@prisma/client', () => {
 const prisma = new PrismaClient();
 
 describe('modifier Controller', () => {
-  let req, res;
+  let req, res, next;
 
   beforeEach(() => {
     req = {
@@ -29,6 +29,7 @@ describe('modifier Controller', () => {
       json: jest.fn(),
       status: jest.fn().mockReturnThis()
     };
+    next = jest.fn();
 
     jest.clearAllMocks();
   });
@@ -50,7 +51,7 @@ describe('modifier Controller', () => {
       prisma.produit.findUnique.mockResolvedValue(produitExistant);
       prisma.produit.update.mockResolvedValue(produitModifie);
 
-      await modifier(req, res);
+      await modifier(req, res, next);
 
       expect(prisma.produit.findUnique).toHaveBeenCalledWith({ where: { id: uuid } });
       expect(prisma.produit.update).toHaveBeenCalledWith({
@@ -65,28 +66,27 @@ describe('modifier Controller', () => {
 
       expect(res.json).toHaveBeenCalledWith({
         success: true,
-        message: 'Produit mis à jour avec succès',
+        message: 'Produit modifié avec succès',
         data: produitModifie
       });
+      expect(next).not.toHaveBeenCalled();
     });
   });
 
   describe('Produit non trouvé', () => {
-    it('retourne 404 si le produit n’existe pas', async () => {
+    it('retourne 404 si le produit n\'existe pas', async () => {
       const uuid = "not-found-id";
       req.params = { uuid };
 
       prisma.produit.findUnique.mockResolvedValue(null);
 
-      await modifier(req, res);
+      await modifier(req, res, next);
 
       expect(prisma.produit.findUnique).toHaveBeenCalledWith({ where: { id: uuid } });
       expect(prisma.produit.update).not.toHaveBeenCalled();
-      expect(res.status).toHaveBeenCalledWith(404);
-      expect(res.json).toHaveBeenCalledWith({
-        success: false,
-        message: 'Produit non trouvé'
-      });
+      expect(next).toHaveBeenCalledWith(expect.any(Error));
+      expect(res.status).not.toHaveBeenCalled();
+      expect(res.json).not.toHaveBeenCalled();
     });
   });
 
@@ -98,18 +98,11 @@ describe('modifier Controller', () => {
       req.params = { uuid };
       prisma.produit.findUnique.mockRejectedValue(mockError);
 
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+      await modifier(req, res, next);
 
-      await modifier(req, res);
-
-      expect(consoleSpy).toHaveBeenCalledWith("Erreur:", mockError);
-      expect(res.status).toHaveBeenCalledWith(500);
-      expect(res.json).toHaveBeenCalledWith({
-        success: false,
-        message: 'Erreur serveur'
-      });
-
-      consoleSpy.mockRestore();
+      expect(next).toHaveBeenCalledWith(mockError);
+      expect(res.status).not.toHaveBeenCalled();
+      expect(res.json).not.toHaveBeenCalled();
     });
 
     it('gère les erreurs lors de update', async () => {
@@ -123,18 +116,11 @@ describe('modifier Controller', () => {
       prisma.produit.findUnique.mockResolvedValue(produitExistant);
       prisma.produit.update.mockRejectedValue(mockError);
 
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
+      await modifier(req, res, next);
 
-      await modifier(req, res);
-
-      expect(consoleSpy).toHaveBeenCalledWith("Erreur:", mockError);
-      expect(res.status).toHaveBeenCalledWith(500);
-      expect(res.json).toHaveBeenCalledWith({
-        success: false,
-        message: 'Erreur serveur'
-      });
-
-      consoleSpy.mockRestore();
+      expect(next).toHaveBeenCalledWith(mockError);
+      expect(res.status).not.toHaveBeenCalled();
+      expect(res.json).not.toHaveBeenCalled();
     });
   });
 
@@ -154,7 +140,7 @@ describe('modifier Controller', () => {
       prisma.produit.findUnique.mockResolvedValue(produitExistant);
       prisma.produit.update.mockResolvedValue(produitModifie);
 
-      await modifier(req, res);
+      await modifier(req, res, next);
 
       expect(prisma.produit.update).toHaveBeenCalledWith({
         where: { id: uuid },
@@ -162,6 +148,7 @@ describe('modifier Controller', () => {
           nom: "Validé"
         }
       });
+      expect(next).not.toHaveBeenCalled();
     });
 
     it('ne fait rien si aucun champ n’est fourni', async () => {
@@ -170,17 +157,18 @@ describe('modifier Controller', () => {
       const produitModifie = { id: uuid };
 
       req.params = { uuid };
-      req.body = {}; // Aucun champ
+      req.body = {}; 
 
       prisma.produit.findUnique.mockResolvedValue(produitExistant);
       prisma.produit.update.mockResolvedValue(produitModifie);
 
-      await modifier(req, res);
+      await modifier(req, res, next);
 
       expect(prisma.produit.update).toHaveBeenCalledWith({
         where: { id: uuid },
         data: {}
       });
+      expect(next).not.toHaveBeenCalled();
     });
   });
 
@@ -188,9 +176,10 @@ describe('modifier Controller', () => {
     it('gère l’absence de paramètre uuid', async () => {
       req.params = {}; // uuid absent
 
-      await modifier(req, res);
+      await modifier(req, res, next);
 
       expect(prisma.produit.findUnique).toHaveBeenCalledWith({ where: { id: undefined } });
+      expect(next).toHaveBeenCalledWith(expect.any(Error));
     });
   });
 });

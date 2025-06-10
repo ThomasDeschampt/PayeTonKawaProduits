@@ -7,7 +7,7 @@ jest.mock('../../services/produits', () => ({
 }));
 
 describe('ajouter Controller', () => {
-  let req, res;
+  let req, res, next;
 
   beforeEach(() => {
     // Mock des objets req et res
@@ -18,6 +18,7 @@ describe('ajouter Controller', () => {
       json: jest.fn(),
       status: jest.fn().mockReturnThis(),
     };
+    next = jest.fn();
     
     // Reset des mocks avant chaque test
     jest.clearAllMocks();
@@ -53,7 +54,7 @@ describe('ajouter Controller', () => {
       produitService.createProduit.mockResolvedValue(mockNouveauProduit);
 
       // Exécution de la fonction
-      await ajouter(req, res);
+      await ajouter(req, res, next);
 
       // Vérifications
       expect(produitService.createProduit).toHaveBeenCalledWith(req.body);
@@ -64,6 +65,7 @@ describe('ajouter Controller', () => {
         data: mockNouveauProduit,
         message: 'Produit créé avec succès'
       });
+      expect(next).not.toHaveBeenCalled();
     });
 
     it('devrait créer un produit avec seulement nom et prix', async () => {
@@ -84,7 +86,7 @@ describe('ajouter Controller', () => {
 
       produitService.createProduit.mockResolvedValue(mockNouveauProduit);
 
-      await ajouter(req, res);
+      await ajouter(req, res, next);
 
       expect(produitService.createProduit).toHaveBeenCalledWith(req.body);
 
@@ -94,6 +96,7 @@ describe('ajouter Controller', () => {
         data: mockNouveauProduit,
         message: 'Produit créé avec succès'
       });
+      expect(next).not.toHaveBeenCalled();
     });
 
     it('devrait gérer description vide et stock par défaut', async () => {
@@ -116,9 +119,10 @@ describe('ajouter Controller', () => {
 
       produitService.createProduit.mockResolvedValue(mockNouveauProduit);
 
-      await ajouter(req, res);
+      await ajouter(req, res, next);
 
       expect(produitService.createProduit).toHaveBeenCalledWith(req.body);
+      expect(next).not.toHaveBeenCalled();
     });
 
     it('devrait convertir correctement les types numériques', async () => {
@@ -140,9 +144,10 @@ describe('ajouter Controller', () => {
 
       produitService.createProduit.mockResolvedValue(mockNouveauProduit);
 
-      await ajouter(req, res);
+      await ajouter(req, res, next);
 
       expect(produitService.createProduit).toHaveBeenCalledWith(req.body);
+      expect(next).not.toHaveBeenCalled();
     });
   });
 
@@ -153,18 +158,14 @@ describe('ajouter Controller', () => {
         description: 'Test',
       };
 
-      // Le service doit lever une erreur de validation
-      produitService.createProduit.mockRejectedValue(new Error('Le nom et le prix sont requis'));
+      const error = new Error('Le nom et le prix sont requis');
+      produitService.createProduit.mockRejectedValue(error);
 
-      await ajouter(req, res);
+      await ajouter(req, res, next);
 
-      expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.json).toHaveBeenCalledWith({
-        success: false,
-        message: 'Le nom et le prix sont requis'
-      });
-
-      expect(produitService.createProduit).toHaveBeenCalledWith(req.body);
+      expect(next).toHaveBeenCalledWith(error);
+      expect(res.status).not.toHaveBeenCalled();
+      expect(res.json).not.toHaveBeenCalled();
     });
 
     it('devrait retourner une erreur si le prix est manquant', async () => {
@@ -173,17 +174,14 @@ describe('ajouter Controller', () => {
         description: 'Test'
       };
 
-      produitService.createProduit.mockRejectedValue(new Error('Le nom et le prix sont requis'));
+      const error = new Error('Le nom et le prix sont requis');
+      produitService.createProduit.mockRejectedValue(error);
 
-      await ajouter(req, res);
+      await ajouter(req, res, next);
 
-      expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.json).toHaveBeenCalledWith({
-        success: false,
-        message: 'Le nom et le prix sont requis'
-      });
-
-      expect(produitService.createProduit).toHaveBeenCalledWith(req.body);
+      expect(next).toHaveBeenCalledWith(error);
+      expect(res.status).not.toHaveBeenCalled();
+      expect(res.json).not.toHaveBeenCalled();
     });
 
     it('devrait retourner une erreur si le nom est une chaîne vide', async () => {
@@ -192,17 +190,14 @@ describe('ajouter Controller', () => {
         prix: '25.99'
       };
 
-      produitService.createProduit.mockRejectedValue(new Error('Le nom et le prix sont requis'));
+      const error = new Error('Le nom et le prix sont requis');
+      produitService.createProduit.mockRejectedValue(error);
 
-      await ajouter(req, res);
+      await ajouter(req, res, next);
 
-      expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.json).toHaveBeenCalledWith({
-        success: false,
-        message: 'Le nom et le prix sont requis'
-      });
-
-      expect(produitService.createProduit).toHaveBeenCalledWith(req.body);
+      expect(next).toHaveBeenCalledWith(error);
+      expect(res.status).not.toHaveBeenCalled();
+      expect(res.json).not.toHaveBeenCalled();
     });
 
     it('devrait accepter un prix de 0 en string', async () => {
@@ -222,11 +217,10 @@ describe('ajouter Controller', () => {
 
       produitService.createProduit.mockResolvedValue(mockNouveauProduit);
 
-      await ajouter(req, res);
+      await ajouter(req, res, next);
 
       expect(produitService.createProduit).toHaveBeenCalledWith(req.body);
-
-      expect(res.status).toHaveBeenCalledWith(201);
+      expect(next).not.toHaveBeenCalled();
     });
   });
 
@@ -237,22 +231,14 @@ describe('ajouter Controller', () => {
         prix: '25.99'
       };
 
-      const mockError = new Error('Erreur de contrainte unique');
-      produitService.createProduit.mockRejectedValue(mockError);
+      const error = new Error('Erreur de base de données');
+      produitService.createProduit.mockRejectedValue(error);
 
-      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
+      await ajouter(req, res, next);
 
-      await ajouter(req, res);
-
-      expect(consoleErrorSpy).toHaveBeenCalledWith('Erreur:', mockError);
-
-      expect(res.status).toHaveBeenCalledWith(500);
-      expect(res.json).toHaveBeenCalledWith({
-        success: false,
-        message: 'Erreur de contrainte unique'
-      });
-
-      consoleErrorSpy.mockRestore();
+      expect(next).toHaveBeenCalledWith(error);
+      expect(res.status).not.toHaveBeenCalled();
+      expect(res.json).not.toHaveBeenCalled();
     });
 
     it('devrait gérer les erreurs Prisma spécifiques (P2002 - contrainte unique)', async () => {
@@ -261,22 +247,14 @@ describe('ajouter Controller', () => {
         prix: '15.99'
       };
 
-      const prismaError = {
-        code: 'P2002',
-        message: 'Unique constraint failed',
-        meta: { target: ['nom'] }
-      };
+      const error = new Error('Un produit avec ce nom existe déjà');
+      produitService.createProduit.mockRejectedValue(error);
 
-      produitService.createProduit.mockRejectedValue(prismaError);
+      await ajouter(req, res, next);
 
-      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
-
-      await ajouter(req, res);
-
-      expect(consoleErrorSpy).toHaveBeenCalledWith('Erreur:', prismaError);
-      expect(res.status).toHaveBeenCalledWith(500);
-
-      consoleErrorSpy.mockRestore();
+      expect(next).toHaveBeenCalledWith(error);
+      expect(res.status).not.toHaveBeenCalled();
+      expect(res.json).not.toHaveBeenCalled();
     });
 
     it('devrait gérer les erreurs sans message spécifique', async () => {
@@ -285,20 +263,14 @@ describe('ajouter Controller', () => {
         prix: '25.99'
       };
 
-      const errorWithoutMessage = {};
-      produitService.createProduit.mockRejectedValue(errorWithoutMessage);
+      const error = new Error('Erreur serveur');
+      produitService.createProduit.mockRejectedValue(error);
 
-      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
+      await ajouter(req, res, next);
 
-      await ajouter(req, res);
-
-      expect(res.status).toHaveBeenCalledWith(500);
-      expect(res.json).toHaveBeenCalledWith({
-        success: false,
-        message: 'Erreur serveur'
-      });
-
-      consoleErrorSpy.mockRestore();
+      expect(next).toHaveBeenCalledWith(error);
+      expect(res.status).not.toHaveBeenCalled();
+      expect(res.json).not.toHaveBeenCalled();
     });
   });
 
@@ -314,10 +286,11 @@ describe('ajouter Controller', () => {
       const mockProduit = { id: 6, nom: 'Test Appel' };
       produitService.createProduit.mockResolvedValue(mockProduit);
 
-      await ajouter(req, res);
+      await ajouter(req, res, next);
 
       expect(produitService.createProduit).toHaveBeenCalledTimes(1);
       expect(produitService.createProduit).toHaveBeenCalledWith(req.body);
+      expect(next).not.toHaveBeenCalled();
     });
 
     it('devrait appeler createProduit même si la validation échoue', async () => {
@@ -325,12 +298,15 @@ describe('ajouter Controller', () => {
         description: 'Sans nom ni prix'
       };
 
-      produitService.createProduit.mockRejectedValue(new Error('Le nom et le prix sont requis'));
+      const error = new Error('Le nom et le prix sont requis');
+      produitService.createProduit.mockRejectedValue(error);
 
-      await ajouter(req, res);
+      await ajouter(req, res, next);
 
       expect(produitService.createProduit).toHaveBeenCalledWith(req.body);
-      expect(res.status).toHaveBeenCalledWith(400);
+      expect(next).toHaveBeenCalledWith(error);
+      expect(res.status).not.toHaveBeenCalled();
+      expect(res.json).not.toHaveBeenCalled();
     });
   });
 
@@ -341,11 +317,14 @@ describe('ajouter Controller', () => {
         prix: ''
       };
 
-      produitService.createProduit.mockRejectedValue(new Error('Le nom et le prix sont requis'));
+      const error = new Error('Le nom et le prix sont requis');
+      produitService.createProduit.mockRejectedValue(error);
 
-      await ajouter(req, res);
+      await ajouter(req, res, next);
 
-      expect(res.status).toHaveBeenCalledWith(400);
+      expect(next).toHaveBeenCalledWith(error);
+      expect(res.status).not.toHaveBeenCalled();
+      expect(res.json).not.toHaveBeenCalled();
     });
 
     it('devrait retourner 500 pour une erreur serveur générique', async () => {
@@ -354,11 +333,14 @@ describe('ajouter Controller', () => {
         prix: '25.99'
       };
 
-      produitService.createProduit.mockRejectedValue(new Error('Erreur de base de données'));
+      const error = new Error('Erreur de base de données');
+      produitService.createProduit.mockRejectedValue(error);
 
-      await ajouter(req, res);
+      await ajouter(req, res, next);
 
-      expect(res.status).toHaveBeenCalledWith(500);
+      expect(next).toHaveBeenCalledWith(error);
+      expect(res.status).not.toHaveBeenCalled();
+      expect(res.json).not.toHaveBeenCalled();
     });
 
     it('devrait retourner 201 en cas de succès', async () => {
@@ -370,9 +352,10 @@ describe('ajouter Controller', () => {
       const mockProduit = { id: 1, nom: 'Produit Succès' };
       produitService.createProduit.mockResolvedValue(mockProduit);
 
-      await ajouter(req, res);
+      await ajouter(req, res, next);
 
       expect(res.status).toHaveBeenCalledWith(201);
+      expect(next).not.toHaveBeenCalled();
     });
   });
 });

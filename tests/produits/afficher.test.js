@@ -7,7 +7,7 @@ jest.mock('../../services/produits', () => ({
 }));
 
 describe('afficher Controller', () => {
-  let req, res;
+  let req, res, next;
 
   beforeEach(() => {
     req = {
@@ -17,6 +17,7 @@ describe('afficher Controller', () => {
       json: jest.fn(),
       status: jest.fn().mockReturnThis(),
     };
+    next = jest.fn();
 
     jest.clearAllMocks();
   });
@@ -61,21 +62,12 @@ describe('afficher Controller', () => {
     req.params.uuid = '123e4567-e89b-12d3-a456-426614174000';
     produitService.getProduit.mockRejectedValue(mockError);
 
-    // Mock de console.error pour éviter l'affichage dans les tests
-    const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
-
-    await afficher(req, res);
+    await afficher(req, res, next);
 
     expect(produitService.getProduit).toHaveBeenCalledWith('123e4567-e89b-12d3-a456-426614174000');
-    expect(consoleSpy).toHaveBeenCalledWith('Erreur:', mockError);
-    expect(res.status).toHaveBeenCalledWith(500);
-    expect(res.json).toHaveBeenCalledWith({
-      success: false,
-      message: 'Erreur serveur',
-    });
-
-    // Nettoyage du spy
-    consoleSpy.mockRestore();
+    expect(next).toHaveBeenCalledWith(mockError);
+    expect(res.status).not.toHaveBeenCalled();
+    expect(res.json).not.toHaveBeenCalled();
   });
 
   it('devrait appeler le service avec le bon UUID', async () => {
@@ -90,16 +82,16 @@ describe('afficher Controller', () => {
   });
 
   it('devrait gérer les UUIDs vides ou undefined', async () => {
-    req.params.uuid = undefined;
-    produitService.getProduit.mockResolvedValue(null);
+    req.params = {};
 
-    await afficher(req, res);
+    const error = new Error('UUID manquant');
+    produitService.getProduit.mockRejectedValue(error);
+
+    await afficher(req, res, next);
 
     expect(produitService.getProduit).toHaveBeenCalledWith(undefined);
-    expect(res.status).toHaveBeenCalledWith(404);
-    expect(res.json).toHaveBeenCalledWith({
-      success: false,
-      message: 'Produit non trouvé',
-    });
+    expect(next).toHaveBeenCalledWith(error);
+    expect(res.status).not.toHaveBeenCalled();
+    expect(res.json).not.toHaveBeenCalled();
   });
 });
