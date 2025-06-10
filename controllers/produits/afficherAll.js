@@ -3,7 +3,6 @@ const prisma = new PrismaClient();
 
 // Afficher tout les produits
 const afficherAll = async (req, res) => {
-    console.log("Afficher tout les produits", req);
 
 
   try {

@@ -3,7 +3,6 @@ const prisma = new PrismaClient();
 
 // Modifier un produit
 const modifier = async (req, res) => {
-  console.log("Modifier un produit ", req);
 
   try {
     const { uuid } = req.params;

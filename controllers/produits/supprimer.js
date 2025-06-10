@@ -3,7 +3,6 @@ const prisma = new PrismaClient();
 
 // Supprimer un produit
 const supprimer = async (req, res) => {
-    console.log("Supprimer un produit ", req);
 
   try {
     const { uuid } = req.params;
