@@ -4,7 +4,7 @@ services:
   api-produits:
     build: .
     ports:
-      - "3002:3000"
+      - "3001:3000"
     environment:
       - NODE_ENV=production
       - DATABASE_URL=${DATABASE_URL}
@@ -20,7 +20,7 @@ services:
     build: 
       context: ../PayeTonKawaCommandes
     ports:
-      - "3003:3000"
+      - "3002:3000"
     environment:
       - NODE_ENV=production
       - DATABASE_URL=${DATABASE_URL}
@@ -36,7 +36,7 @@ services:
     build:
       context: ../PayeTonKawaClients
     ports:
-      - "3004:3000"
+      - "3003:3000"
     environment:
       - NODE_ENV=production
       - DATABASE_URL=${DATABASE_URL}
