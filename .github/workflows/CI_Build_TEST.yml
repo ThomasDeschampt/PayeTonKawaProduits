@@ -15,6 +15,8 @@ jobs:
     steps:
     - name: 🚀 Cloner le code du dépôt
       uses: actions/checkout@v4 # Action pour récupérer votre code depuis GitHub
+    - name: 🔍 Afficher les variables d’environnement
+      run: printenv | sort
 
     - name: ⚙️ Configurer l'environnement Node.js
       uses: actions/setup-node@v4 # Action pour installer Node.js
