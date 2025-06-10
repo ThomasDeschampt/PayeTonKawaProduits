@@ -3,7 +3,7 @@ require('dotenv').config();
 
 const RABBITMQ_URL = process.env.RABBITMQ_URL || 'amqp://admin:admin@localhost:5672';
 const MAX_RETRIES = 5;
-const RETRY_DELAY = 5000;
+const RETRY_DELAY = 2000;
 
 class RabbitMQService {
     constructor() {
@@ -14,6 +14,7 @@ class RabbitMQService {
             port3003: 'queue_port_3003',
             port3004: 'queue_port_3004'
         };
+        console.log('Service RabbitMQ initialisé avec URL:', RABBITMQ_URL);
     }
 
     async connect() {
@@ -22,7 +23,10 @@ class RabbitMQService {
         while (retries < MAX_RETRIES) {
             try {
                 console.log(`Tentative de connexion à RabbitMQ (${retries + 1}/${MAX_RETRIES})...`);
+                console.log('URL de connexion:', RABBITMQ_URL);
+                
                 this.connection = await amqp.connect(RABBITMQ_URL);
+                console.log('Connexion AMQP établie');
                 
                 this.connection.on('error', (err) => {
                     console.error('Erreur de connexion RabbitMQ:', err);
@@ -35,15 +39,16 @@ class RabbitMQService {
                 });
 
                 this.channel = await this.connection.createChannel();
-                console.log('Connecté à RabbitMQ avec succès');
+                console.log('Canal RabbitMQ créé');
 
-                // Déclaration des queues
                 for (const queue of Object.values(this.queues)) {
                     await this.channel.assertQueue(queue, {
                         durable: true
                     });
+                    console.log(`Queue ${queue} déclarée`);
                 }
 
+                console.log('Connexion à RabbitMQ établie avec succès');
                 return;
             } catch (error) {
                 retries++;
@@ -53,6 +58,7 @@ class RabbitMQService {
                     throw new Error(`Impossible de se connecter à RabbitMQ après ${MAX_RETRIES} tentatives`);
                 }
                 
+                console.log(`Nouvelle tentative dans ${RETRY_DELAY/1000} secondes...`);
                 await new Promise(resolve => setTimeout(resolve, RETRY_DELAY));
             }
         }
