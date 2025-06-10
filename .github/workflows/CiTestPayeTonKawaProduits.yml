@@ -4,11 +4,11 @@ on:
   push:
     branches:
       - main    # Déclenche le workflow à chaque push sur la branche 'main'
-      - develop # Si vous utilisez une branche de développement
+      - test # Si vous utilisez une branche de développement
   pull_request:
     branches:
       - main    # Déclenche pour les Pull Requests ciblant 'main'
-      - develop # Si vous utilisez une branche de développement
+      - test # Si vous utilisez une branche de développement
 
 jobs:
   test:
