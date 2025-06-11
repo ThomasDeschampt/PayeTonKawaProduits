@@ -2,7 +2,7 @@ require('dotenv').config();
 
 module.exports = {
     server: {
-        port: process.env.PORT || 3007,
+        port: process.env.PORT || 3001,
         env: process.env.NODE_ENV || 'development'
     },
     database: {
@@ -13,7 +13,7 @@ module.exports = {
         expiration: process.env.JWT_EXPIRATION || '1h'
     },
     rabbitmq: {
-        url: process.env.RABBITMQ_URL || 'amqp://localhost',
+        url: process.env.RABBITMQ_URL || 'amqp://admin:admin@localhost:4001',
         user: process.env.RABBITMQ_USER || 'guest',
         password: process.env.RABBITMQ_PASSWORD || 'guest'
     },
