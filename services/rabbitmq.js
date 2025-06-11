@@ -6,6 +6,30 @@ const RABBITMQ_URL = process.env.RABBITMQ_URL || 'amqp://admin:admin@localhost:4
 const MAX_RETRIES = 3;
 const RETRY_DELAY = 1000;
 
+// Configuration des queues et échanges
+const EXCHANGES = {
+    COMMAND: 'command.exchange',
+    PRODUCT: 'product.exchange',
+    CLIENT: 'client.exchange'
+};
+
+const QUEUES = {
+    // Queues pour les produits
+    PRODUCT_CREATED: 'product.created',
+    PRODUCT_UPDATED: 'product.updated',
+    PRODUCT_DELETED: 'product.deleted',
+    
+    // Queues pour les commandes
+    ORDER_CREATED: 'order.created',
+    ORDER_UPDATED: 'order.updated',
+    ORDER_DELETED: 'order.deleted',
+    
+    // Queues pour les clients
+    CLIENT_CREATED: 'client.created',
+    CLIENT_UPDATED: 'client.updated',
+    CLIENT_DELETED: 'client.deleted'
+};
+
 class RabbitMQService {
     constructor() {
         this.connection = null;
@@ -61,6 +85,32 @@ class RabbitMQService {
                         await this.channel.assertQueue(queue, { durable: true });
                     }
                 }
+
+                // Déclaration des échanges
+                await this.channel.assertExchange(EXCHANGES.COMMAND, 'topic', { durable: true });
+                await this.channel.assertExchange(EXCHANGES.PRODUCT, 'topic', { durable: true });
+                await this.channel.assertExchange(EXCHANGES.CLIENT, 'topic', { durable: true });
+
+                // Déclaration des queues
+                for (const queue of Object.values(QUEUES)) {
+                    await this.channel.assertQueue(queue, { durable: true });
+                }
+
+                // Binding des queues aux échanges
+                // Produits
+                await this.channel.bindQueue(QUEUES.PRODUCT_CREATED, EXCHANGES.PRODUCT, 'product.created');
+                await this.channel.bindQueue(QUEUES.PRODUCT_UPDATED, EXCHANGES.PRODUCT, 'product.updated');
+                await this.channel.bindQueue(QUEUES.PRODUCT_DELETED, EXCHANGES.PRODUCT, 'product.deleted');
+
+                // Commandes
+                await this.channel.bindQueue(QUEUES.ORDER_CREATED, EXCHANGES.COMMAND, 'order.created');
+                await this.channel.bindQueue(QUEUES.ORDER_UPDATED, EXCHANGES.COMMAND, 'order.updated');
+                await this.channel.bindQueue(QUEUES.ORDER_DELETED, EXCHANGES.COMMAND, 'order.deleted');
+
+                // Clients
+                await this.channel.bindQueue(QUEUES.CLIENT_CREATED, EXCHANGES.CLIENT, 'client.created');
+                await this.channel.bindQueue(QUEUES.CLIENT_UPDATED, EXCHANGES.CLIENT, 'client.updated');
+                await this.channel.bindQueue(QUEUES.CLIENT_DELETED, EXCHANGES.CLIENT, 'client.deleted');
 
                 console.log('Connexion à RabbitMQ établie avec succès');
                 this.isConnecting = false;
@@ -167,4 +217,11 @@ class RabbitMQService {
 }
 
 const rabbitmq = new RabbitMQService();
-module.exports = rabbitmq; 
+module.exports = {
+    rabbitmq,
+    initializeRabbitMQ: rabbitmq.connect,
+    publishMessage: rabbitmq.sendMessage,
+    consumeMessages: rabbitmq.listenToPort,
+    EXCHANGES,
+    QUEUES
+}; 
