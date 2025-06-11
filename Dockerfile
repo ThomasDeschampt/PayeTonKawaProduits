@@ -19,7 +19,7 @@ COPY . .
 RUN mkdir -p logs
 
 # Exposer le port
-EXPOSE 3000
+EXPOSE 3001
 
 # Commande de démarrage
 CMD ["npm", "start"] 
