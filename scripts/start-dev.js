@@ -1,38 +1,52 @@
 const { execSync } = require('child_process');
+const path = require('path');
 
-function stopDockerServices() {
-    console.log("Arrêt des services Docker existants...");
+// Fonction pour exécuter une commande et afficher sa sortie
+function runCommand(command) {
     try {
-        execSync("docker-compose down", { stdio: "inherit" });
-        console.log("Services Docker arrêtés avec succès");
+        console.log(`Exécution de la commande: ${command}`);
+        execSync(command, { stdio: 'inherit' });
     } catch (error) {
-        console.error("Erreur lors de l'arrêt des services Docker:", error.message);
-    }
-}
-
-function startDockerServices() {
-    console.log("Démarrage des services Docker...");
-    try {
-        execSync("docker-compose up -d", { stdio: "inherit" });
-        console.log("Services Docker démarrés avec succès");
-    } catch (error) {
-        console.error("Erreur lors du démarrage des services Docker:", error.message);
+        console.error(`Erreur lors de l'exécution de la commande: ${command}`);
+        console.error(error.message);
         process.exit(1);
     }
 }
 
-async function main() {
-    stopDockerServices();
-    startDockerServices();
-
-    console.log("Attente du démarrage des services...");
-    await new Promise(resolve => setTimeout(resolve, 10000));
-
-    console.log("Démarrage de l'application...");
-    execSync("nodemon server.js", { stdio: "inherit" });
+// Fonction pour arrêter les services Docker
+function stopDockerServices() {
+    console.log('Arrêt des services Docker existants...');
+    try {
+        runCommand('docker-compose down');
+        console.log('Services Docker arrêtés avec succès');
+    } catch (error) {
+        console.log('Aucun service Docker en cours d\'exécution');
+    }
 }
 
-main().catch(error => {
-    console.error("Erreur:", error);
-    process.exit(1);
-}); 
+// Fonction pour démarrer les services Docker
+function startDockerServices() {
+    console.log('Démarrage des services Docker...');
+    runCommand('docker-compose up -d');
+    console.log('Services Docker démarrés avec succès');
+}
+
+// Fonction principale
+async function main() {
+    try {
+        // Arrêter les services existants
+        stopDockerServices();
+
+        // Démarrer les services
+        startDockerServices();
+
+        console.log('\nLes services Docker sont prêts !');
+        console.log('Vous pouvez maintenant lancer votre application avec: npm start');
+    } catch (error) {
+        console.error('Erreur lors du démarrage des services:', error);
+        process.exit(1);
+    }
+}
+
+// Exécuter le script
+main(); 
