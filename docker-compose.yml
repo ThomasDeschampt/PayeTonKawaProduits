@@ -8,7 +8,7 @@ services:
     environment:
       - NODE_ENV=development
       - DATABASE_URL=process.env.DATABASE_URL
-      - RABBITMQ_URL=amqp://admin:admin@rabbitmq:5672
+      - RABBITMQ_URL=amqp://admin:admin@rabbitmq:4001
       - DEBUG=*
       - PORT=3001
     volumes:
@@ -35,8 +35,8 @@ services:
     image: rabbitmq:3-management-alpine
     hostname: rabbitmq
     ports:
-      - "5672:5672"   
-      - "15672:15672" 
+      - "4001:5672"   
+      - "15673:15672" 
     environment:
       - RABBITMQ_DEFAULT_USER=admin
       - RABBITMQ_DEFAULT_PASS=admin
@@ -59,7 +59,7 @@ services:
   prometheus:
     image: prom/prometheus:latest
     ports:
-      - "9090:9090"
+      - "6001:9090"
     volumes:
       - ./prometheus:/etc/prometheus
       - prometheus_data:/prometheus
@@ -75,7 +75,7 @@ services:
   grafana:
     image: grafana/grafana:latest
     ports:
-      - "7070:3000"
+      - "5001:3000"
     volumes:
       - grafana_data:/var/lib/grafana
       - ./grafana/provisioning:/etc/grafana/provisioning
