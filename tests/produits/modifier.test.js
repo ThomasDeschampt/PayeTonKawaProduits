@@ -1,21 +1,9 @@
 const modifier = require('../../controllers/produits/modifier');
-const { PrismaClient } = require('@prisma/client');
+const produitService = require('../../services/produits');
 
-// Mock de Prisma Client
-jest.mock('@prisma/client', () => {
-  const mockPrismaClient = {
-    produit: {
-      findUnique: jest.fn(),
-      update: jest.fn(),
-    },
-    $disconnect: jest.fn(),
-  };
-  return {
-    PrismaClient: jest.fn(() => mockPrismaClient),
-  };
-});
-
-const prisma = new PrismaClient();
+jest.mock('../../services/produits', () => ({
+  updateProduit: jest.fn()
+}));
 
 describe('modifier Controller', () => {
   let req, res, next;
@@ -37,7 +25,6 @@ describe('modifier Controller', () => {
   describe('Cas de succès', () => {
     it('modifie un produit existant avec des champs valides', async () => {
       const uuid = "abc123";
-      const produitExistant = { id: uuid, nom: "Ancien Nom" };
       const produitModifie = { id: uuid, nom: "Nouveau Nom" };
 
       req.params = { uuid };
@@ -48,22 +35,12 @@ describe('modifier Controller', () => {
         photo_url: 'http://example.com/photo.jpg'
       };
 
-      prisma.produit.findUnique.mockResolvedValue(produitExistant);
-      prisma.produit.update.mockResolvedValue(produitModifie);
+      produitService.updateProduit.mockResolvedValue(produitModifie);
 
       await modifier(req, res, next);
 
-      expect(prisma.produit.findUnique).toHaveBeenCalledWith({ where: { id: uuid } });
-      expect(prisma.produit.update).toHaveBeenCalledWith({
-        where: { id: uuid },
-        data: {
-          nom: "Nouveau Nom",
-          prix: 25.5,
-          stock: 10,
-          photo_url: 'http://example.com/photo.jpg'
-        }
-      });
-
+      expect(produitService.updateProduit).toHaveBeenCalledWith(uuid, req.body);
+      expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith({
         success: true,
         message: 'Produit modifié avec succès',
@@ -78,108 +55,49 @@ describe('modifier Controller', () => {
       const uuid = "not-found-id";
       req.params = { uuid };
 
-      prisma.produit.findUnique.mockResolvedValue(null);
+      produitService.updateProduit.mockResolvedValue(null);
 
       await modifier(req, res, next);
 
-      expect(prisma.produit.findUnique).toHaveBeenCalledWith({ where: { id: uuid } });
-      expect(prisma.produit.update).not.toHaveBeenCalled();
-      expect(next).toHaveBeenCalledWith(expect.any(Error));
-      expect(res.status).not.toHaveBeenCalled();
-      expect(res.json).not.toHaveBeenCalled();
+      expect(produitService.updateProduit).toHaveBeenCalledWith(uuid, req.body);
+      expect(res.status).toHaveBeenCalledWith(404);
+      expect(res.json).toHaveBeenCalledWith({
+        success: false,
+        message: 'Produit non trouvé'
+      });
+      expect(next).not.toHaveBeenCalled();
     });
   });
 
   describe('Erreurs serveur', () => {
-    it('gère les erreurs lors de findUnique', async () => {
-      const uuid = "error-find";
-      const mockError = new Error("Erreur DB");
-
+    it('gère les erreurs lancées par updateProduit', async () => {
+      const uuid = "error-case";
+      const error = new Error("Erreur serveur");
       req.params = { uuid };
-      prisma.produit.findUnique.mockRejectedValue(mockError);
+      req.body = { nom: "Erreur" };
+
+      produitService.updateProduit.mockRejectedValue(error);
 
       await modifier(req, res, next);
 
-      expect(next).toHaveBeenCalledWith(mockError);
+      expect(produitService.updateProduit).toHaveBeenCalledWith(uuid, req.body);
+      expect(next).toHaveBeenCalledWith(error);
       expect(res.status).not.toHaveBeenCalled();
       expect(res.json).not.toHaveBeenCalled();
-    });
-
-    it('gère les erreurs lors de update', async () => {
-      const uuid = "error-update";
-      const produitExistant = { id: uuid };
-      const mockError = new Error("Erreur update");
-
-      req.params = { uuid };
-      req.body = { nom: "Test" };
-
-      prisma.produit.findUnique.mockResolvedValue(produitExistant);
-      prisma.produit.update.mockRejectedValue(mockError);
-
-      await modifier(req, res, next);
-
-      expect(next).toHaveBeenCalledWith(mockError);
-      expect(res.status).not.toHaveBeenCalled();
-      expect(res.json).not.toHaveBeenCalled();
-    });
-  });
-
-  describe('Validation des champs', () => {
-    it('ignore les champs invalides (prix et stock vides)', async () => {
-      const uuid = "partial123";
-      const produitExistant = { id: uuid };
-      const produitModifie = { id: uuid, nom: "Validé" };
-
-      req.params = { uuid };
-      req.body = {
-        nom: "Validé",
-        prix: "",
-        stock: ""
-      };
-
-      prisma.produit.findUnique.mockResolvedValue(produitExistant);
-      prisma.produit.update.mockResolvedValue(produitModifie);
-
-      await modifier(req, res, next);
-
-      expect(prisma.produit.update).toHaveBeenCalledWith({
-        where: { id: uuid },
-        data: {
-          nom: "Validé"
-        }
-      });
-      expect(next).not.toHaveBeenCalled();
-    });
-
-    it('ne fait rien si aucun champ n’est fourni', async () => {
-      const uuid = "no-update";
-      const produitExistant = { id: uuid };
-      const produitModifie = { id: uuid };
-
-      req.params = { uuid };
-      req.body = {}; 
-
-      prisma.produit.findUnique.mockResolvedValue(produitExistant);
-      prisma.produit.update.mockResolvedValue(produitModifie);
-
-      await modifier(req, res, next);
-
-      expect(prisma.produit.update).toHaveBeenCalledWith({
-        where: { id: uuid },
-        data: {}
-      });
-      expect(next).not.toHaveBeenCalled();
     });
   });
 
   describe('UUID manquant', () => {
     it('gère l’absence de paramètre uuid', async () => {
-      req.params = {}; // uuid absent
+      req.params = {}; // uuid manquant
+      const error = new Error("UUID manquant");
+
+      produitService.updateProduit.mockRejectedValue(error);
 
       await modifier(req, res, next);
 
-      expect(prisma.produit.findUnique).toHaveBeenCalledWith({ where: { id: undefined } });
-      expect(next).toHaveBeenCalledWith(expect.any(Error));
+      expect(produitService.updateProduit).toHaveBeenCalledWith(undefined, req.body);
+      expect(next).toHaveBeenCalledWith(error);
     });
   });
 });
