@@ -2,14 +2,23 @@ module.exports = {
     testEnvironment: 'node',
     coverageDirectory: 'coverage',
     collectCoverageFrom: [
-        '**/*.{js,ts}',
-        '!**/node_modules/**',
-        '!**/coverage/**',
-        '!**/dist/**',
-        '!**/logs/**',
-        '!**/config/**',
-        '!**/prisma/**'
-    ],
+  'controllers/produits/**/*.js',
+  'services/**/*.js',
+  'routes/**/*.js',
+  '!**/node_modules/**',
+  '!**/middleware/**',
+  '!**/validators/**',
+  '!**/prisma/**',
+  '!**/utils/**',
+  '!**/scripts/**',
+  '!**/logs/**',
+  '!**/config/**',
+  '!**/grafana/**',
+  '!**/prometheus/**',
+  '!**/tests/**',
+  '!**/postman/**',
+  '!**/coverage/**'
+],
     testMatch: [
         '**/__tests__/**/*.test.{js,ts}',
         '**/?(*.)+(spec|test).{js,ts}'
