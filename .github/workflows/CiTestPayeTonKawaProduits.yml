@@ -24,7 +24,7 @@ jobs:
       run: npm ci # 'npm ci' est préféré à 'npm install' dans les CI pour des builds reproductibles et plus rapides
 
     - name: 🧪 Lancer les tests unitaires avec Jest
-      run: npm test # Cette commande exécute le script 'test' défini dans votre package.json (qui devrait être 'jest')
+      run: npm test -- --coverage # Cette commande exécute le script 'test' défini dans votre package.json (qui devrait être 'jest')
       env:
         # Les variables d'environnement nécessaires pour vos tests (même si Prisma est mocké ou si elles sont lues par votre code)
         # sont injectées ici à partir des secrets GitHub (si ce sont des secrets) ou définies directement.
