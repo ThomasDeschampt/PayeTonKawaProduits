@@ -1,4 +1,4 @@
-﻿# PayeTonKawa - Service Produits
+﻿# PayeTonKawa - Service Produits Test
 
 Service de gestion des produits pour l'application PayeTonKawa.
 
