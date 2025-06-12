@@ -30,7 +30,6 @@ jobs:
       - name: Compilation (si nécessaire)
         run: |
           npm ci
-          npm run build # ou remplace par autre chose si nécessaire
 
       - name: Analyse CodeQL
         uses: github/codeql-action/analyze@v2
