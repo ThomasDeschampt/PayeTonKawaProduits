@@ -12,9 +12,7 @@ const ajouter = require('../controllers/produits/ajouter');
 const supprimer = require('../controllers/produits/supprimer');
 const modifier = require('../controllers/produits/modifier');
 
-if (process.env.TEST_BROKEN === 'true') {
-  console.log('Cette branche ne sera pas couverte par les tests');
-}
+
 
 router.get('/afficher/:uuid', validateUUID, afficher);
 router.get('/afficherAll', afficherAll);
@@ -22,9 +20,6 @@ router.post('/ajouter', authorized, ajouter);
 router.put('/modifier/:uuid', authorized, validateUUID, modifier);
 router.delete('/supprimer/:uuid', authorized,validateUUID,supprimer);
 
-function nonAppelee() {
-  console.log("Cette fonction n'est jamais utilisée !");
-}
 
 /**
  * @swagger
