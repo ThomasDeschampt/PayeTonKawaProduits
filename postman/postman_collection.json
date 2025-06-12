@@ -10,6 +10,42 @@
       "item": [
         {
           "name": "Afficher tous les produits",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response 'success' is true\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "});",
+                  "",
+                  "pm.test(\"Response has a non-empty data array\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.data).to.be.an('array').that.is.not.empty;",
+                  "});",
+                  "",
+                  "pm.test(\"Each product has expected properties\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    jsonData.data.forEach(function(product) {",
+                  "        pm.expect(product).to.have.property('id');",
+                  "        pm.expect(product).to.have.property('created_at');",
+                  "        pm.expect(product).to.have.property('nom');",
+                  "        pm.expect(product).to.have.property('prix');",
+                  "        pm.expect(product).to.have.property('description');",
+                  "        pm.expect(product).to.have.property('stock');",
+                  "        pm.expect(product).to.have.property('photo_url');",
+                  "    });",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [

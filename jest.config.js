@@ -1,11 +1,11 @@
 module.exports = {
     testEnvironment: 'node',
     coverageDirectory: 'coverage',
-    collectCoverageFrom: [
+  collectCoverageFrom: [
   'controllers/produits/**/*.js',
-  'services/**/*.js',
-  'routes/**/*.js',
-  '!**/node_modules/**',
+  '!**/rabbitmq.js',
+  '!**/services/**',
+  '!**/routes/**',
   '!**/middleware/**',
   '!**/validators/**',
   '!**/prisma/**',
@@ -15,10 +15,10 @@ module.exports = {
   '!**/config/**',
   '!**/grafana/**',
   '!**/prometheus/**',
-  '!**/rabbitmq/**',
   '!**/tests/**',
   '!**/postman/**',
-  '!**/coverage/**'
+  '!**/coverage/**',
+  '!**/node_modules/**'
 ],
     testMatch: [
         '**/__tests__/**/*.test.{js,ts}',
