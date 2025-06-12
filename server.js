@@ -5,8 +5,9 @@ const setupSwagger = require('./swagger');
 const { PrismaClient } = require('@prisma/client');
 const { rabbitmq } = require('./services/rabbitmq');
 const jwt = require('jsonwebtoken');
-const { metricsMiddleware, metricsRoute } = require('./middleware/metrics');
+const { metricsMiddleware, errorMetricsMiddleware, metricsRoute } = require('./middleware/metrics');
 const errorHandler = require('./middleware/error.middleware');
+const logger = require('./utils/logger');
 const config = require('./config');
 require('dotenv').config();
 
@@ -45,26 +46,24 @@ app.use('*', (req, res) => {
     });
 });
 
+app.use(errorMetricsMiddleware); 
 app.use(errorHandler);
 
 
 
 const server = app.listen(config.server.port, async () => {
-    console.log(`Serveur démarré sur le port ${config.server.port}`);
-    console.log(`API disponible sur http://localhost:${config.server.port}/api`);
-    console.log('Protection DDoS activée (100 req/15min par IP)');
-    console.log('Métriques Prometheus disponibles sur /metrics');
-
-      const jwt = require('jsonwebtoken');
-
-  //temporaire
-  const token = jwt.sign(
-    { username: 'testuser' },
-    process.env.JWT_SECRET,
-    { expiresIn: '1h' }
-  );
-
-  console.log(token);
+    logger.info('Server started', {
+        port: config.server.port,
+        environment: process.env.NODE_ENV || 'development',
+        features: ['DDoS Protection', 'Prometheus Metrics', 'Structured Logging']
+    });
+    
+    // Logs au lieu de console.log
+    logger.info('API endpoints available', {
+        api: `http://localhost:${config.server.port}/api`,
+        metrics: `http://localhost:${config.server.port}/metrics`,
+        swagger: `http://localhost:${config.server.port}/api-docs`
+    });
 });
 
 process.on('SIGTERM', async () => {
