@@ -22,6 +22,10 @@ router.post('/ajouter', authorized, ajouter);
 router.put('/modifier/:uuid', authorized, validateUUID, modifier);
 router.delete('/supprimer/:uuid', authorized,validateUUID,supprimer);
 
+function nonAppelee() {
+  console.log("Cette fonction n'est jamais utilisée !");
+}
+
 /**
  * @swagger
  * api/produit/afficher/{uuid}:
