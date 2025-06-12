@@ -28,7 +28,9 @@ jobs:
         run: npm audit --audit-level=high || true
 
       - name: Analyse statique du code
-        run: eslint . --no-inline-config --rule "prettier/prettier: off"
+        run: |
+          eslint . --no-inline-config --rule "prettier/prettier: off"
+
 
   snyk-scan:
     name: Snyk Security Scan
