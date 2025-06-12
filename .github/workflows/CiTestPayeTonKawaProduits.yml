@@ -1,15 +1,11 @@
 name: CI de tests unitaires Node.js
 
-on:
-  push:
-    branches:
-      - main    # Déclenche le workflow à chaque push sur la branche 'main'
-      - test # Si vous utilisez une branche de développement
-  pull_request:
-    branches:
-      - main    # Déclenche pour les Pull Requests ciblant 'main'
-      - test # Si vous utilisez une branche de développement
 
+on:
+  workflow_run:
+    workflows: ["Build Check - Sanity + Health"]
+    types:
+      - completed
 jobs:
   test:
     runs-on: ubuntu-latest # Utilise la dernière version d'Ubuntu pour l'environnement d'exécution
