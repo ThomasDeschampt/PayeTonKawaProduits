@@ -15,7 +15,7 @@ module.exports = {
   '!**/config/**',
   '!**/grafana/**',
   '!**/prometheus/**',
-  '!**/rabbitmq/**',
+  '!**/rabbitmq**',
   '!**/tests/**',
   '!**/postman/**',
   '!**/coverage/**'
