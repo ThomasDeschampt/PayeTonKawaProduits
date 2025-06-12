@@ -17,7 +17,7 @@ function runCommand(command) {
 function stopDockerServices() {
     console.log('Arrêt des services Docker existants...');
     try {
-        runCommand('docker-compose down');
+        runCommand('docker compose down');
         console.log('Services Docker arrêtés avec succès');
     } catch (error) {
         console.log('Aucun service Docker en cours d\'exécution');
@@ -26,10 +26,15 @@ function stopDockerServices() {
 
 // Fonction pour démarrer les services Docker
 function startDockerServices() {
-    console.log('Démarrage des services Docker...');
-    runCommand('docker-compose up -d');
-    console.log('Services Docker démarrés avec succès');
+    console.log('Démarrage des services Docker (sans api-produits)...');
+    runCommand('docker compose up -d rabbitmq prometheus');
+
+    console.log('Construction du conteneur api-produits...');
+    runCommand('docker compose build api-produits');
+
+    console.log('Services Docker démarrés avec succès, et api-produits est prêt à être lancé en local.');
 }
+
 
 // Fonction principale
 async function main() {
