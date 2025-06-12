@@ -20,9 +20,6 @@ module.exports = {
     prometheus: {
         port: process.env.PROMETHEUS_PORT || 9090
     },
-    grafana: {
-        port: process.env.GRAFANA_PORT || 3000
-    },
     swagger: {
         title: process.env.SWAGGER_TITLE || 'PayeTonKawa API',
         description: process.env.SWAGGER_DESCRIPTION || 'API de gestion des produits pour PayeTonKawa',

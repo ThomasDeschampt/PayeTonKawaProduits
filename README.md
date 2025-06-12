@@ -6,7 +6,7 @@ Service de gestion des produits pour l'application PayeTonKawa.
 
 - Gestion complète des produits (CRUD)
 - API RESTful documentée avec Swagger
-- Monitoring avec Prometheus et Grafana
+- Monitoring avec Prometheus
 - Communication asynchrone avec RabbitMQ
 - Protection contre les attaques DDoS
 - Tests automatisés
@@ -69,9 +69,7 @@ npm run test:coverage
 ```
 
 ## Monitoring
-
 - Métriques Prometheus : `http://localhost:9090`
-- Dashboard Grafana : `http://localhost:7070`
 
 ## Sécurité
 

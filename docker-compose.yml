@@ -5,9 +5,10 @@ services:
     build: .
     ports:
       - "3001:3001"
+    env_file:
+      - .env
     environment:
       - NODE_ENV=development
-      - DATABASE_URL=process.env.DATABASE_URL
       - RABBITMQ_URL=amqp://admin:admin@rabbitmq:5672
       - DEBUG=*
       - PORT=3001
@@ -83,23 +84,6 @@ services:
       - app-network
     restart: unless-stopped
 
-  grafana:
-    image: grafana/grafana:latest
-    ports:
-      - "5001:3000"
-    volumes:
-      - grafana_data:/var/lib/grafana
-      - ./grafana/provisioning:/etc/grafana/provisioning
-    environment:
-      - GF_SECURITY_ADMIN_USER=admin
-      - GF_SECURITY_ADMIN_PASSWORD=admin
-      - GF_USERS_ALLOW_SIGN_UP=false
-    networks:
-      - app-network
-    depends_on:
-      - prometheus
-    restart: unless-stopped
-
 networks:
   app-network:
     driver: bridge
@@ -107,4 +91,3 @@ networks:
 volumes:
   rabbitmq_data:
   prometheus_data:
-  grafana_data: 
