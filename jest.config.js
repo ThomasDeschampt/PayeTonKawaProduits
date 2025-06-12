@@ -19,7 +19,8 @@ module.exports = {
     forceExit: true,
     clearMocks: true,
     resetMocks: true,
-    restoreMocks: true,
+    restoreMocks: true
+        
   coverageThreshold: {
     global: {
       branches: 95,
