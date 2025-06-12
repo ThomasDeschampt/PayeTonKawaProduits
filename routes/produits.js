@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const rabbitmq = require('../services/rabbitmq');
 
-const authorized = require('../middleware/auth');
+const { authorized, adminOnly, authorizedRole } = require("../middleware/auth");
 const validateUUID = require('../middleware/uuidValidation.js');
 
 //controllers de produits
@@ -16,9 +16,9 @@ const modifier = require('../controllers/produits/modifier');
 
 router.get('/afficher/:uuid', validateUUID, afficher);
 router.get('/afficherAll', afficherAll);
-router.post('/ajouter', authorized, ajouter);
-router.put('/modifier/:uuid', authorized, validateUUID, modifier);
-router.delete('/supprimer/:uuid', authorized,validateUUID,supprimer);
+router.post('/ajouter', adminOnly, ajouter);
+router.put('/modifier/:uuid', adminOnly, validateUUID, modifier);
+router.delete('/supprimer/:uuid', adminOnly, validateUUID,supprimer);
 
 
 /**
