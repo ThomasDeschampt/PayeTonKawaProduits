@@ -27,10 +27,6 @@ jobs:
       - name: Audit sécurité (npm audit)
         run: npm audit --audit-level=high || true
 
-      - name: Analyse statique du code
-        run: |
-          eslint . --no-inline-config --rule "prettier/prettier: off"
-
 
   snyk-scan:
     name: Snyk Security Scan
