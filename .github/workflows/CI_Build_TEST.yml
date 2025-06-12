@@ -22,7 +22,7 @@ jobs:
 
       - name: Run container briefly (sanity check)
         run: |
-          docker run -d --name app-test payetonkawa-produit
+          docker run -d --name app-test -e JWT_SECRET=secrets.JWT_SECRET payetonkawa-produit
           sleep 10
 
       - name: Show container logs
