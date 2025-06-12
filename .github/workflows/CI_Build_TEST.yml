@@ -1,4 +1,4 @@
-name: Build Check - Sanity + Health
+name: CI_tests_Build_Produits
 
 on:
   push:
