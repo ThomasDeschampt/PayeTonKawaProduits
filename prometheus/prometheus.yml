@@ -7,6 +7,7 @@ scrape_configs:
     static_configs:
       - targets: 
         - 'api-produits:3001'
+        - 'host.docker.internal:3001'
         - 'api-produits-2:3007'
     metrics_path: '/metrics'
 

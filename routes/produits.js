@@ -13,8 +13,8 @@ const supprimer = require('../controllers/produits/supprimer');
 const modifier = require('../controllers/produits/modifier');
 
 
-router.get('/afficher/:uuid', authorized, validateUUID, afficher);
-router.get('/afficherAll', authorized, afficherAll);
+router.get('/afficher/:uuid', validateUUID, afficher);
+router.get('/afficherAll', afficherAll);
 router.post('/ajouter', authorized, ajouter);
 router.put('/modifier/:uuid', authorized, validateUUID, modifier);
 router.delete('/supprimer/:uuid', authorized,validateUUID,supprimer);
