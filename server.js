@@ -3,7 +3,7 @@ const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 const setupSwagger = require('./swagger');
 const { PrismaClient } = require('@prisma/client');
-const { rabbitmq } = require('./services/rabbitmq');
+const rabbitmq = require('./services/rabbitmqService');
 const jwt = require('jsonwebtoken');
 const { metricsMiddleware, errorMetricsMiddleware, metricsRoute } = require('./middleware/metrics');
 const errorHandler = require('./middleware/error.middleware');
@@ -49,21 +49,27 @@ app.use('*', (req, res) => {
 app.use(errorMetricsMiddleware); 
 app.use(errorHandler);
 
-
-
 const server = app.listen(config.server.port, async () => {
-    logger.info('Server started', {
-        port: config.server.port,
-        environment: process.env.NODE_ENV || 'development',
-        features: ['DDoS Protection', 'Prometheus Metrics', 'Structured Logging']
-    });
-    
-    // Logs au lieu de console.log
-    logger.info('API endpoints available', {
-        api: `http://localhost:${config.server.port}/api`,
-        metrics: `http://localhost:${config.server.port}/metrics`,
-        swagger: `http://localhost:${config.server.port}/api-docs`
-    });
+    try {
+        // Initialiser RabbitMQ
+        await rabbitmq.connect();
+        
+        logger.info('Server started', {
+            port: config.server.port,
+            environment: process.env.NODE_ENV || 'development',
+            features: ['DDoS Protection', 'Prometheus Metrics', 'Structured Logging', 'RabbitMQ']
+        });
+        
+        // Logs au lieu de console.log
+        logger.info('API endpoints available', {
+            api: `http://localhost:${config.server.port}/api`,
+            metrics: `http://localhost:${config.server.port}/metrics`,
+            swagger: `http://localhost:${config.server.port}/api-docs`
+        });
+    } catch (error) {
+        logger.error('Failed to start server', { error: error.message });
+        process.exit(1);
+    }
 });
 
 process.on('SIGTERM', async () => {
