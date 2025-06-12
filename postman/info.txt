@@ -1,13 +1,14 @@
-Pour tester les API : 
+Les fichiers postman_collection.json et postman_environment.json sont des exemples qui permettent à la fois :
+  - de tester les API manuellement
+  - de lancer automatiquement les tests d'intégration
 
-- lancer le serveur avec la commande : 
-  npm run dev
 
-- copier le token jwt renvoyé dans la console
-- coller le token à la ligne 13 du fichier postman_environment.json
+Etape 1 : Lancer le serveur
+npm start
 
-- importer les fichiers postman_collection.json et postman_environment.json dans Postman
+Etape 2 : Récupérer le token JWT
+Pour récupérer le token JWT, vous pouvez utiliser Postman pour faire une requête POST à l'endpoint de vérification du micro service client.
+Une fois le token récupéré, copiez-le dans le fichier postman_environment.json à la ligne 13.
 
--sélectionné l'environnement "API Produit - Dev" dans Postman
-
-- lancer les requêtes
+Etape 3 : Lancer les tests d'intégration
+newman run .\postman\postman_collection.json -e .\postman\postman_environment.json
