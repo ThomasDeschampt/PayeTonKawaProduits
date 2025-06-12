@@ -3,7 +3,7 @@ name: CI_tests_unitaires_Produits
 
 on:
   workflow_run:
-    workflows: ["Build Check - Sanity + Health"]
+    workflows: ["CI_tests_Build_Produits"]
     types:
       - completed
 jobs:
