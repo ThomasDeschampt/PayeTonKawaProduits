@@ -19,5 +19,14 @@ module.exports = {
     forceExit: true,
     clearMocks: true,
     resetMocks: true,
-    restoreMocks: true
+    restoreMocks: true,
+      // 💥 Seuil de couverture obligatoire à 95%
+  coverageThreshold: {
+    global: {
+      branches: 95,
+      functions: 95,
+      lines: 95,
+      statements: 95
+    }
+    
 };
