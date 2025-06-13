@@ -1,21 +1,15 @@
 const supprimer = require('../../controllers/produits/supprimer');
-const { PrismaClient } = require('@prisma/client');
 
-// Mock de Prisma Client
-jest.mock('@prisma/client', () => {
-  const mockPrismaClient = {
-    produit: {
-      findUnique: jest.fn(),
-      delete: jest.fn(),
-    },
-    $disconnect: jest.fn(),
-  };
-  return {
-    PrismaClient: jest.fn(() => mockPrismaClient),
-  };
-});
+// Mock des services
+jest.mock('../../services/produits', () => ({
+  deleteProduit: jest.fn(),
+}));
+jest.mock('../../services/rabbitmqService', () => ({
+  publishProductDeleted: jest.fn(),
+}));
 
-const prisma = new PrismaClient();
+const produitService = require('../../services/produits');
+const rabbitmq = require('../../services/rabbitmqService');
 
 describe('supprimer Controller', () => {
   let req, res, next;
@@ -36,17 +30,15 @@ describe('supprimer Controller', () => {
   describe('Cas de succès', () => {
     it('supprime un produit existant', async () => {
       const uuid = "abc123";
-      const produitMock = { id: uuid, nom: 'Test' };
-
       req.params = { uuid };
 
-      prisma.produit.findUnique.mockResolvedValue(produitMock);
-      prisma.produit.delete.mockResolvedValue(produitMock);
+      produitService.deleteProduit.mockResolvedValue();
+      rabbitmq.publishProductDeleted.mockResolvedValue();
 
       await supprimer(req, res, next);
 
-      expect(prisma.produit.findUnique).toHaveBeenCalledWith({ where: { id: uuid } });
-      expect(prisma.produit.delete).toHaveBeenCalledWith({ where: { id: uuid } });
+      expect(produitService.deleteProduit).toHaveBeenCalledWith(uuid);
+      expect(rabbitmq.publishProductDeleted).toHaveBeenCalledWith(uuid);
 
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith({
@@ -57,66 +49,29 @@ describe('supprimer Controller', () => {
     });
   });
 
-  describe('Produit non trouvé', () => {
-    it('retourne 404 si le produit est absent', async () => {
-      const uuid = "inexistant123";
-      req.params = { uuid };
+  describe('Erreur lors de la suppression', () => {
+    it('appelle next avec une erreur si deleteProduit échoue', async () => {
+      const uuid = "abc123";
+      const error = new Error("Erreur suppression");
 
-      prisma.produit.findUnique.mockResolvedValue(null);
+      req.params = { uuid };
+      produitService.deleteProduit.mockRejectedValue(error);
 
       await supprimer(req, res, next);
 
-      expect(prisma.produit.findUnique).toHaveBeenCalledWith({ where: { id: uuid } });
-      expect(prisma.produit.delete).not.toHaveBeenCalled();
-      expect(next).toHaveBeenCalledWith(expect.any(Error));
+      expect(next).toHaveBeenCalledWith(error);
       expect(res.status).not.toHaveBeenCalled();
       expect(res.json).not.toHaveBeenCalled();
     });
   });
 
-  describe('Erreurs serveur', () => {
-    it('gère les erreurs lors du findUnique', async () => {
-      const uuid = "error123";
-      const mockError = new Error("Erreur DB");
-
-      req.params = { uuid };
-      prisma.produit.findUnique.mockRejectedValue(mockError);
+  describe('UUID manquant', () => {
+    it('appelle next avec une erreur si uuid est manquant', async () => {
+      req.params = {};
 
       await supprimer(req, res, next);
 
-      expect(next).toHaveBeenCalledWith(mockError);
-      expect(res.status).not.toHaveBeenCalled();
-      expect(res.json).not.toHaveBeenCalled();
-    });
-
-    it('gère les erreurs lors du delete', async () => {
-      const uuid = "error-delete";
-      const produitMock = { id: uuid };
-      const mockError = new Error("Erreur suppression");
-
-      req.params = { uuid };
-
-      prisma.produit.findUnique.mockResolvedValue(produitMock);
-      prisma.produit.delete.mockRejectedValue(mockError);
-
-      await supprimer(req, res, next);
-
-      expect(next).toHaveBeenCalledWith(mockError);
-      expect(res.status).not.toHaveBeenCalled();
-      expect(res.json).not.toHaveBeenCalled();
-    });
-  });
-
-  describe('Vérifications diverses', () => {
-    it('ne fait rien si uuid est manquant', async () => {
-      req.params = {}; // uuid manquant
-
-      await supprimer(req, res, next);
-
-      expect(prisma.produit.findUnique).toHaveBeenCalledWith({ where: { id: undefined } });
-      expect(next).toHaveBeenCalledWith(expect.any(Error));
-      expect(res.status).not.toHaveBeenCalled();
-      expect(res.json).not.toHaveBeenCalled();
+      expect(produitService.deleteProduit).toHaveBeenCalledWith(undefined);
     });
   });
 });

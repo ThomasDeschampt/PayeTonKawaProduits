@@ -8,29 +8,25 @@ on:
       - completed
 jobs:
   test:
-    runs-on: ubuntu-latest # Utilise la dernière version d'Ubuntu pour l'environnement d'exécution
+    runs-on: ubuntu-latest
 
     steps:
     - name: 🚀 Cloner le code du dépôt
-      uses: actions/checkout@v4 # Action pour récupérer votre code depuis GitHub
+      uses: actions/checkout@v4
 
     - name: ⚙️ Configurer l'environnement Node.js
-      uses: actions/setup-node@v4 # Action pour installer Node.js
+      uses: actions/setup-node@v4
       with:
-        node-version: '20' # IMPORTANT : Assurez-vous que cette version de Node.js correspond à celle de votre projet
-        cache: 'npm'       # Active le cache pour les dépendances npm, ce qui accélère les exécutions futures
+        node-version: '20'
+        cache: 'npm'  
 
     - name: 📦 Installer les dépendances npm
-      run: npm ci # 'npm ci' est préféré à 'npm install' dans les CI pour des builds reproductibles et plus rapides
+      run: npm ci
 
     - name: 🧪 Lancer les tests unitaires avec Jest
-      run: npm test -- --coverage # Cette commande exécute le script 'test' défini dans votre package.json (qui devrait être 'jest')
+      run: npm test -- --coverage 
       env:
-        # Les variables d'environnement nécessaires pour vos tests (même si Prisma est mocké ou si elles sont lues par votre code)
-        # sont injectées ici à partir des secrets GitHub (si ce sont des secrets) ou définies directement.
-        # Les noms des variables (DATABASE_URL, JWT_SECRET, JWT_EXPIRE) doivent correspondre EXACTEMENT
-        # aux noms que vous avez définis dans les secrets de votre dépôt GitHub.
         DATABASE_URL: ${{ secrets.DATABASE_URL }}
         JWT_SECRET: ${{ secrets.JWT_SECRET }}
         JWT_EXPIRE: ${{ secrets.JWT_EXPIRE }}
-        PORT: 3000 # Le port peut aussi être nécessaire si vos tests démarrent un petit serveur ou simulent des appels HTTP
+        PORT: 3000

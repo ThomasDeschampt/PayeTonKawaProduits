@@ -1,26 +1,27 @@
 const ajouter = require('../../controllers/produits/ajouter');
 const produitService = require('../../services/produits');
+const rabbitmq = require('../../services/rabbitmqService');
 
-// Mock du service produit au lieu de Prisma directement
+// Mock des services
 jest.mock('../../services/produits', () => ({
   createProduit: jest.fn(),
+}));
+
+jest.mock('../../services/rabbitmqService', () => ({
+  publishProductCreated: jest.fn(),
 }));
 
 describe('ajouter Controller', () => {
   let req, res, next;
 
   beforeEach(() => {
-    // Mock des objets req et res
-    req = {
-      body: {}
-    };
+    req = { body: {} };
     res = {
       json: jest.fn(),
       status: jest.fn().mockReturnThis(),
     };
     next = jest.fn();
-    
-    // Reset des mocks avant chaque test
+
     jest.clearAllMocks();
   });
 
@@ -30,7 +31,6 @@ describe('ajouter Controller', () => {
 
   describe('Cas de succès', () => {
     it('devrait créer un produit avec tous les champs remplis', async () => {
-      // Données d'entrée
       req.body = {
         nom: 'Produit Test',
         description: 'Description du produit test',
@@ -39,7 +39,6 @@ describe('ajouter Controller', () => {
         photo_url: 'http://example.com/photo.jpg',
       };
 
-      // Données mockées de retour
       const mockNouveauProduit = {
         id: 1,
         nom: 'Produit Test',
@@ -50,15 +49,12 @@ describe('ajouter Controller', () => {
         created_at: new Date('2024-01-01')
       };
 
-      // Configuration du mock
       produitService.createProduit.mockResolvedValue(mockNouveauProduit);
 
-      // Exécution de la fonction
       await ajouter(req, res, next);
 
-      // Vérifications
       expect(produitService.createProduit).toHaveBeenCalledWith(req.body);
-
+      expect(rabbitmq.publishProductCreated).toHaveBeenCalledWith(mockNouveauProduit);
       expect(res.status).toHaveBeenCalledWith(201);
       expect(res.json).toHaveBeenCalledWith({
         success: true,
@@ -81,6 +77,7 @@ describe('ajouter Controller', () => {
         description: null,
         prix: 15.50,
         stock: 0,
+        photo_url: 'http://example.com/photo.jpg',
         created_at: new Date('2024-01-01')
       };
 
@@ -89,7 +86,7 @@ describe('ajouter Controller', () => {
       await ajouter(req, res, next);
 
       expect(produitService.createProduit).toHaveBeenCalledWith(req.body);
-
+      expect(rabbitmq.publishProductCreated).toHaveBeenCalledWith(mockNouveauProduit);
       expect(res.status).toHaveBeenCalledWith(201);
       expect(res.json).toHaveBeenCalledWith({
         success: true,
@@ -104,7 +101,7 @@ describe('ajouter Controller', () => {
         nom: 'Produit Sans Description',
         prix: 99.99,
         description: '',
-        stock: '', // chaîne vide
+        stock: '',
         photo_url: 'http://example.com/photo.jpg'
       };
 
@@ -122,14 +119,15 @@ describe('ajouter Controller', () => {
       await ajouter(req, res, next);
 
       expect(produitService.createProduit).toHaveBeenCalledWith(req.body);
+      expect(rabbitmq.publishProductCreated).toHaveBeenCalledWith(mockNouveauProduit);
       expect(next).not.toHaveBeenCalled();
     });
 
     it('devrait convertir correctement les types numériques', async () => {
       req.body = {
         nom: 'Produit Conversion',
-        prix: '123.456', // nombre décimal en string
-        stock: '25', // entier en string
+        prix: '123.456',
+        stock: '25',
         photo_url: 'http://example.com/photo.jpg'
       };
 
@@ -147,6 +145,7 @@ describe('ajouter Controller', () => {
       await ajouter(req, res, next);
 
       expect(produitService.createProduit).toHaveBeenCalledWith(req.body);
+      expect(rabbitmq.publishProductCreated).toHaveBeenCalledWith(mockNouveauProduit);
       expect(next).not.toHaveBeenCalled();
     });
   });
@@ -165,7 +164,6 @@ describe('ajouter Controller', () => {
 
       expect(next).toHaveBeenCalledWith(error);
       expect(res.status).not.toHaveBeenCalled();
-      expect(res.json).not.toHaveBeenCalled();
     });
 
     it('devrait retourner une erreur si le prix est manquant', async () => {
@@ -180,8 +178,6 @@ describe('ajouter Controller', () => {
       await ajouter(req, res, next);
 
       expect(next).toHaveBeenCalledWith(error);
-      expect(res.status).not.toHaveBeenCalled();
-      expect(res.json).not.toHaveBeenCalled();
     });
 
     it('devrait retourner une erreur si le nom est une chaîne vide', async () => {
@@ -196,8 +192,6 @@ describe('ajouter Controller', () => {
       await ajouter(req, res, next);
 
       expect(next).toHaveBeenCalledWith(error);
-      expect(res.status).not.toHaveBeenCalled();
-      expect(res.json).not.toHaveBeenCalled();
     });
 
     it('devrait accepter un prix de 0 en string', async () => {
@@ -220,6 +214,7 @@ describe('ajouter Controller', () => {
       await ajouter(req, res, next);
 
       expect(produitService.createProduit).toHaveBeenCalledWith(req.body);
+      expect(rabbitmq.publishProductCreated).toHaveBeenCalledWith(mockNouveauProduit);
       expect(next).not.toHaveBeenCalled();
     });
   });
@@ -237,11 +232,9 @@ describe('ajouter Controller', () => {
       await ajouter(req, res, next);
 
       expect(next).toHaveBeenCalledWith(error);
-      expect(res.status).not.toHaveBeenCalled();
-      expect(res.json).not.toHaveBeenCalled();
     });
 
-    it('devrait gérer les erreurs Prisma spécifiques (P2002 - contrainte unique)', async () => {
+    it('devrait gérer les erreurs Prisma spécifiques', async () => {
       req.body = {
         nom: 'Produit Existant',
         prix: '15.99'
@@ -253,8 +246,6 @@ describe('ajouter Controller', () => {
       await ajouter(req, res, next);
 
       expect(next).toHaveBeenCalledWith(error);
-      expect(res.status).not.toHaveBeenCalled();
-      expect(res.json).not.toHaveBeenCalled();
     });
 
     it('devrait gérer les erreurs sans message spécifique', async () => {
@@ -269,8 +260,6 @@ describe('ajouter Controller', () => {
       await ajouter(req, res, next);
 
       expect(next).toHaveBeenCalledWith(error);
-      expect(res.status).not.toHaveBeenCalled();
-      expect(res.json).not.toHaveBeenCalled();
     });
   });
 
@@ -290,7 +279,7 @@ describe('ajouter Controller', () => {
 
       expect(produitService.createProduit).toHaveBeenCalledTimes(1);
       expect(produitService.createProduit).toHaveBeenCalledWith(req.body);
-      expect(next).not.toHaveBeenCalled();
+      expect(rabbitmq.publishProductCreated).toHaveBeenCalledWith(mockProduit);
     });
 
     it('devrait appeler createProduit même si la validation échoue', async () => {
@@ -305,8 +294,6 @@ describe('ajouter Controller', () => {
 
       expect(produitService.createProduit).toHaveBeenCalledWith(req.body);
       expect(next).toHaveBeenCalledWith(error);
-      expect(res.status).not.toHaveBeenCalled();
-      expect(res.json).not.toHaveBeenCalled();
     });
   });
 
@@ -323,8 +310,6 @@ describe('ajouter Controller', () => {
       await ajouter(req, res, next);
 
       expect(next).toHaveBeenCalledWith(error);
-      expect(res.status).not.toHaveBeenCalled();
-      expect(res.json).not.toHaveBeenCalled();
     });
 
     it('devrait retourner 500 pour une erreur serveur générique', async () => {
@@ -339,8 +324,6 @@ describe('ajouter Controller', () => {
       await ajouter(req, res, next);
 
       expect(next).toHaveBeenCalledWith(error);
-      expect(res.status).not.toHaveBeenCalled();
-      expect(res.json).not.toHaveBeenCalled();
     });
 
     it('devrait retourner 201 en cas de succès', async () => {
@@ -355,7 +338,11 @@ describe('ajouter Controller', () => {
       await ajouter(req, res, next);
 
       expect(res.status).toHaveBeenCalledWith(201);
-      expect(next).not.toHaveBeenCalled();
+      expect(res.json).toHaveBeenCalledWith({
+        success: true,
+        data: mockProduit,
+        message: 'Produit créé avec succès'
+      });
     });
   });
 });

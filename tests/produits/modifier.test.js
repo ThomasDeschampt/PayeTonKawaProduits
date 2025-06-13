@@ -1,9 +1,16 @@
 const modifier = require('../../controllers/produits/modifier');
 const produitService = require('../../services/produits');
 
+// Mocks
 jest.mock('../../services/produits', () => ({
   updateProduit: jest.fn()
 }));
+
+jest.mock('../../services/rabbitmqService', () => ({
+  publishProductUpdated: jest.fn()
+}));
+
+const rabbitmq = require('../../services/rabbitmqService');
 
 describe('modifier Controller', () => {
   let req, res, next;
@@ -36,10 +43,12 @@ describe('modifier Controller', () => {
       };
 
       produitService.updateProduit.mockResolvedValue(produitModifie);
+      rabbitmq.publishProductUpdated.mockResolvedValue();
 
       await modifier(req, res, next);
 
       expect(produitService.updateProduit).toHaveBeenCalledWith(uuid, req.body);
+      expect(rabbitmq.publishProductUpdated).toHaveBeenCalledWith(produitModifie);
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith({
         success: true,
@@ -89,7 +98,7 @@ describe('modifier Controller', () => {
 
   describe('UUID manquant', () => {
     it('gère l’absence de paramètre uuid', async () => {
-      req.params = {}; // uuid manquant
+      req.params = {};
       const error = new Error("UUID manquant");
 
       produitService.updateProduit.mockRejectedValue(error);

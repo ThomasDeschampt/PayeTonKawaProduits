@@ -3,12 +3,12 @@ name: CI_tests_Build_Produits
 on:
   push:
     branches:
-      - main    # Déclenche le workflow à chaque push sur la branche 'main'
-      - test # Si vous utilisez une branche de développement
+      - main
+      - test
   pull_request:
     branches:
-      - main    # Déclenche pour les Pull Requests ciblant 'main'
-      - test # Si vous utilisez une branche de développement
+      - main
+      - test
 
 jobs:
   build-check:
