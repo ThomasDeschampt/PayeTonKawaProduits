@@ -178,3 +178,733 @@
   level: 'info',
   message: 'API Call Success'
 }
+{
+  service: 'api-produits',
+  port: '3001',
+  environment: 'development',
+  features: [
+    'DDoS Protection',
+    'Prometheus Metrics',
+    'Structured Logging',
+    'RabbitMQ'
+  ],
+  level: 'info',
+  message: 'Server started',
+  timestamp: '2025-06-13 12:18:40'
+}
+{
+  service: 'api-produits',
+  api: 'http://localhost:3001/api',
+  metrics: 'http://localhost:3001/metrics',
+  swagger: 'http://localhost:3001/api-docs',
+  level: 'info',
+  message: 'API endpoints available',
+  timestamp: '2025-06-13 12:18:40'
+}
+{
+  service: 'api-produits',
+  port: '3001',
+  environment: 'development',
+  features: [
+    'DDoS Protection',
+    'Prometheus Metrics',
+    'Structured Logging',
+    'RabbitMQ'
+  ],
+  level: 'info',
+  message: 'Server started',
+  timestamp: '2025-06-13 12:19:55'
+}
+{
+  service: 'api-produits',
+  api: 'http://localhost:3001/api',
+  metrics: 'http://localhost:3001/metrics',
+  swagger: 'http://localhost:3001/api-docs',
+  level: 'info',
+  message: 'API endpoints available',
+  timestamp: '2025-06-13 12:19:55'
+}
+{
+  service: 'api-produits',
+  timestamp: '2025-06-13 12:21:20',
+  method: 'GET',
+  url: '/api/produits/afficherAll',
+  route: '/afficherAll',
+  statusCode: 500,
+  duration: '321ms',
+  userAgent: 'PostmanRuntime/7.39.1',
+  ip: '::ffff:172.18.0.1',
+  query: {},
+  body: undefined,
+  level: 'warn',
+  message: 'API Call Warning'
+}
+{
+  service: 'api-produits',
+  timestamp: '2025-06-13 12:21:21',
+  method: 'GET',
+  url: '/api/produits/afficher/9eca355c-1984-4601-a2bb-9a36a80f5187',
+  route: '/afficher/:uuid',
+  statusCode: 200,
+  duration: '0ms',
+  userAgent: 'PostmanRuntime/7.39.1',
+  ip: '::ffff:172.18.0.1',
+  query: {},
+  body: undefined,
+  error: {
+    message: '\n' +
+      'Invalid `prisma.produit.findUnique()` invocation in\n' +
+      '/usr/src/app/services/produits.js:25:42\n' +
+      '\n' +
+      '  22 }\n' +
+      '  23 \n' +
+      '  24 async getProduit(uuid) {\n' +
+      '→ 25   const produit = await prisma.produit.findUnique(\n' +
+      "Can't reach database server at `db.khgblbqooxqtbyrjepjf.supabase.co:5432`\n" +
+      '\n' +
+      'Please make sure your database server is running at `db.khgblbqooxqtbyrjepjf.supabase.co:5432`.',
+    stack: 'PrismaClientInitializationError: \n' +
+      'Invalid `prisma.produit.findUnique()` invocation in\n' +
+      '/usr/src/app/services/produits.js:25:42\n' +
+      '\n' +
+      '  22 }\n' +
+      '  23 \n' +
+      '  24 async getProduit(uuid) {\n' +
+      '→ 25   const produit = await prisma.produit.findUnique(\n' +
+      "Can't reach database server at `db.khgblbqooxqtbyrjepjf.supabase.co:5432`\n" +
+      '\n' +
+      'Please make sure your database server is running at `db.khgblbqooxqtbyrjepjf.supabase.co:5432`.\n' +
+      '    at Zn.handleRequestError (/usr/src/app/node_modules/@prisma/client/runtime/library.js:121:7759)\n' +
+      '    at Zn.handleAndLogRequestError (/usr/src/app/node_modules/@prisma/client/runtime/library.js:121:6784)\n' +
+      '    at Zn.request (/usr/src/app/node_modules/@prisma/client/runtime/library.js:121:6491)\n' +
+      '    at async l (/usr/src/app/node_modules/@prisma/client/runtime/library.js:130:9778)\n' +
+      '    at async ProduitService.getProduit (/usr/src/app/services/produits.js:25:21)\n' +
+      '    at async afficher (/usr/src/app/controllers/produits/afficher.js:6:21)',
+    name: 'PrismaClientInitializationError'
+  },
+  level: 'error',
+  message: 'API Call Failed'
+}
+{
+  service: 'api-produits',
+  clientVersion: '6.8.2',
+  errorCode: undefined,
+  retryable: undefined,
+  name: 'PrismaClientInitializationError',
+  level: 'error',
+  message: 'Erreur: \n' +
+    'Invalid `prisma.produit.findUnique()` invocation in\n' +
+    '/usr/src/app/services/produits.js:25:42\n' +
+    '\n' +
+    '  22 }\n' +
+    '  23 \n' +
+    '  24 async getProduit(uuid) {\n' +
+    '→ 25   const produit = await prisma.produit.findUnique(\n' +
+    "Can't reach database server at `db.khgblbqooxqtbyrjepjf.supabase.co:5432`\n" +
+    '\n' +
+    'Please make sure your database server is running at `db.khgblbqooxqtbyrjepjf.supabase.co:5432`.',
+  stack: 'PrismaClientInitializationError: \n' +
+    'Invalid `prisma.produit.findUnique()` invocation in\n' +
+    '/usr/src/app/services/produits.js:25:42\n' +
+    '\n' +
+    '  22 }\n' +
+    '  23 \n' +
+    '  24 async getProduit(uuid) {\n' +
+    '→ 25   const produit = await prisma.produit.findUnique(\n' +
+    "Can't reach database server at `db.khgblbqooxqtbyrjepjf.supabase.co:5432`\n" +
+    '\n' +
+    'Please make sure your database server is running at `db.khgblbqooxqtbyrjepjf.supabase.co:5432`.\n' +
+    '    at Zn.handleRequestError (/usr/src/app/node_modules/@prisma/client/runtime/library.js:121:7759)\n' +
+    '    at Zn.handleAndLogRequestError (/usr/src/app/node_modules/@prisma/client/runtime/library.js:121:6784)\n' +
+    '    at Zn.request (/usr/src/app/node_modules/@prisma/client/runtime/library.js:121:6491)\n' +
+    '    at async l (/usr/src/app/node_modules/@prisma/client/runtime/library.js:130:9778)\n' +
+    '    at async ProduitService.getProduit (/usr/src/app/services/produits.js:25:21)\n' +
+    '    at async afficher (/usr/src/app/controllers/produits/afficher.js:6:21)',
+  timestamp: '2025-06-13 12:21:21'
+}
+{
+  service: 'api-produits',
+  timestamp: '2025-06-13 12:21:21',
+  method: 'GET',
+  url: '/api/produits/afficher/9eca355c-1984-4601-a2bb-9a36a80f5187',
+  route: '/afficher/:uuid',
+  statusCode: 500,
+  duration: '216ms',
+  userAgent: 'PostmanRuntime/7.39.1',
+  ip: '::ffff:172.18.0.1',
+  query: {},
+  body: undefined,
+  level: 'warn',
+  message: 'API Call Warning'
+}
+{
+  service: 'api-produits',
+  timestamp: '2025-06-13 12:21:21',
+  method: 'GET',
+  url: '/api/produits/afficher/invalid-uuid',
+  route: '/afficher/:uuid',
+  statusCode: 400,
+  duration: '4ms',
+  userAgent: 'PostmanRuntime/7.39.1',
+  ip: '::ffff:172.18.0.1',
+  query: {},
+  body: undefined,
+  level: 'warn',
+  message: 'API Call Warning'
+}
+{
+  service: 'api-produits',
+  timestamp: '2025-06-13 12:21:21',
+  method: 'POST',
+  url: '/api/produits',
+  route: '/',
+  statusCode: 404,
+  duration: '22ms',
+  userAgent: 'PostmanRuntime/7.39.1',
+  ip: '::ffff:172.18.0.1',
+  query: {},
+  body: {
+    nom: 'Café Arabica',
+    description: 'Café de haute qualité',
+    prix: 10.99,
+    stock: 25,
+    photo_url: 'https://example.com/images/cafe-arabica.jpg'
+  },
+  level: 'warn',
+  message: 'API Call Warning'
+}
+{
+  service: 'api-produits',
+  timestamp: '2025-06-13 12:21:21',
+  method: 'POST',
+  url: '/api/produits',
+  route: '/',
+  statusCode: 404,
+  duration: '3ms',
+  userAgent: 'PostmanRuntime/7.39.1',
+  ip: '::ffff:172.18.0.1',
+  query: {},
+  body: {
+    description: 'Café de haute qualité',
+    stock: 25,
+    photo_url: 'https://example.com/images/cafe-arabica.jpg'
+  },
+  level: 'warn',
+  message: 'API Call Warning'
+}
+{
+  service: 'api-produits',
+  timestamp: '2025-06-13 12:21:21',
+  method: 'PUT',
+  url: '/api/produits/modifier/9eca355c-1984-4601-a2bb-9a36a80f5187',
+  route: '/modifier/:uuid',
+  statusCode: 403,
+  duration: '5ms',
+  userAgent: 'PostmanRuntime/7.39.1',
+  ip: '::ffff:172.18.0.1',
+  query: {},
+  body: undefined,
+  level: 'warn',
+  message: 'API Call Warning'
+}
+{
+  service: 'api-produits',
+  timestamp: '2025-06-13 12:21:21',
+  method: 'PUT',
+  url: '/api/produits/modifier/invalid-uuid',
+  route: '/modifier/:uuid',
+  statusCode: 403,
+  duration: '4ms',
+  userAgent: 'PostmanRuntime/7.39.1',
+  ip: '::ffff:172.18.0.1',
+  query: {},
+  body: undefined,
+  level: 'warn',
+  message: 'API Call Warning'
+}
+{
+  service: 'api-produits',
+  timestamp: '2025-06-13 12:21:21',
+  method: 'DELETE',
+  url: '/api/produits/supprimer/9eca355c-1984-4601-a2bb-9a36a80f5187',
+  route: '/supprimer/:uuid',
+  statusCode: 403,
+  duration: '4ms',
+  userAgent: 'PostmanRuntime/7.39.1',
+  ip: '::ffff:172.18.0.1',
+  query: {},
+  body: undefined,
+  level: 'warn',
+  message: 'API Call Warning'
+}
+{
+  service: 'api-produits',
+  timestamp: '2025-06-13 12:21:21',
+  method: 'DELETE',
+  url: '/api/produits/supprimer/invalid-uuid',
+  route: '/supprimer/:uuid',
+  statusCode: 403,
+  duration: '2ms',
+  userAgent: 'PostmanRuntime/7.39.1',
+  ip: '::ffff:172.18.0.1',
+  query: {},
+  body: undefined,
+  level: 'warn',
+  message: 'API Call Warning'
+}
+{
+  service: 'api-produits',
+  timestamp: '2025-06-13 12:21:45',
+  method: 'GET',
+  url: '/api/produits/afficherAll',
+  route: '/afficherAll',
+  statusCode: 500,
+  duration: '5149ms',
+  userAgent: 'PostmanRuntime/7.39.1',
+  ip: '::ffff:172.18.0.1',
+  query: {},
+  body: undefined,
+  level: 'warn',
+  message: 'API Call Warning'
+}
+{
+  service: 'api-produits',
+  timestamp: '2025-06-13 12:21:50',
+  method: 'GET',
+  url: '/api/produits/afficher/9eca355c-1984-4601-a2bb-9a36a80f5187',
+  route: '/afficher/:uuid',
+  statusCode: 200,
+  duration: '-1ms',
+  userAgent: 'PostmanRuntime/7.39.1',
+  ip: '::ffff:172.18.0.1',
+  query: {},
+  body: undefined,
+  error: {
+    message: '\n' +
+      'Invalid `prisma.produit.findUnique()` invocation in\n' +
+      '/usr/src/app/services/produits.js:25:42\n' +
+      '\n' +
+      '  22 }\n' +
+      '  23 \n' +
+      '  24 async getProduit(uuid) {\n' +
+      '→ 25   const produit = await prisma.produit.findUnique(\n' +
+      "Can't reach database server at `db.khgblbqooxqtbyrjepjf.supabase.co:5432`\n" +
+      '\n' +
+      'Please make sure your database server is running at `db.khgblbqooxqtbyrjepjf.supabase.co:5432`.',
+    stack: 'PrismaClientInitializationError: \n' +
+      'Invalid `prisma.produit.findUnique()` invocation in\n' +
+      '/usr/src/app/services/produits.js:25:42\n' +
+      '\n' +
+      '  22 }\n' +
+      '  23 \n' +
+      '  24 async getProduit(uuid) {\n' +
+      '→ 25   const produit = await prisma.produit.findUnique(\n' +
+      "Can't reach database server at `db.khgblbqooxqtbyrjepjf.supabase.co:5432`\n" +
+      '\n' +
+      'Please make sure your database server is running at `db.khgblbqooxqtbyrjepjf.supabase.co:5432`.\n' +
+      '    at Zn.handleRequestError (/usr/src/app/node_modules/@prisma/client/runtime/library.js:121:7759)\n' +
+      '    at Zn.handleAndLogRequestError (/usr/src/app/node_modules/@prisma/client/runtime/library.js:121:6784)\n' +
+      '    at Zn.request (/usr/src/app/node_modules/@prisma/client/runtime/library.js:121:6491)\n' +
+      '    at async l (/usr/src/app/node_modules/@prisma/client/runtime/library.js:130:9778)\n' +
+      '    at async ProduitService.getProduit (/usr/src/app/services/produits.js:25:21)\n' +
+      '    at async afficher (/usr/src/app/controllers/produits/afficher.js:6:21)',
+    name: 'PrismaClientInitializationError'
+  },
+  level: 'error',
+  message: 'API Call Failed'
+}
+{
+  service: 'api-produits',
+  clientVersion: '6.8.2',
+  errorCode: undefined,
+  retryable: undefined,
+  name: 'PrismaClientInitializationError',
+  level: 'error',
+  message: 'Erreur: \n' +
+    'Invalid `prisma.produit.findUnique()` invocation in\n' +
+    '/usr/src/app/services/produits.js:25:42\n' +
+    '\n' +
+    '  22 }\n' +
+    '  23 \n' +
+    '  24 async getProduit(uuid) {\n' +
+    '→ 25   const produit = await prisma.produit.findUnique(\n' +
+    "Can't reach database server at `db.khgblbqooxqtbyrjepjf.supabase.co:5432`\n" +
+    '\n' +
+    'Please make sure your database server is running at `db.khgblbqooxqtbyrjepjf.supabase.co:5432`.',
+  stack: 'PrismaClientInitializationError: \n' +
+    'Invalid `prisma.produit.findUnique()` invocation in\n' +
+    '/usr/src/app/services/produits.js:25:42\n' +
+    '\n' +
+    '  22 }\n' +
+    '  23 \n' +
+    '  24 async getProduit(uuid) {\n' +
+    '→ 25   const produit = await prisma.produit.findUnique(\n' +
+    "Can't reach database server at `db.khgblbqooxqtbyrjepjf.supabase.co:5432`\n" +
+    '\n' +
+    'Please make sure your database server is running at `db.khgblbqooxqtbyrjepjf.supabase.co:5432`.\n' +
+    '    at Zn.handleRequestError (/usr/src/app/node_modules/@prisma/client/runtime/library.js:121:7759)\n' +
+    '    at Zn.handleAndLogRequestError (/usr/src/app/node_modules/@prisma/client/runtime/library.js:121:6784)\n' +
+    '    at Zn.request (/usr/src/app/node_modules/@prisma/client/runtime/library.js:121:6491)\n' +
+    '    at async l (/usr/src/app/node_modules/@prisma/client/runtime/library.js:130:9778)\n' +
+    '    at async ProduitService.getProduit (/usr/src/app/services/produits.js:25:21)\n' +
+    '    at async afficher (/usr/src/app/controllers/produits/afficher.js:6:21)',
+  timestamp: '2025-06-13 12:21:50'
+}
+{
+  service: 'api-produits',
+  timestamp: '2025-06-13 12:21:50',
+  method: 'GET',
+  url: '/api/produits/afficher/9eca355c-1984-4601-a2bb-9a36a80f5187',
+  route: '/afficher/:uuid',
+  statusCode: 500,
+  duration: '5193ms',
+  userAgent: 'PostmanRuntime/7.39.1',
+  ip: '::ffff:172.18.0.1',
+  query: {},
+  body: undefined,
+  level: 'warn',
+  message: 'API Call Warning'
+}
+{
+  service: 'api-produits',
+  timestamp: '2025-06-13 12:21:50',
+  method: 'GET',
+  url: '/api/produits/afficher/invalid-uuid',
+  route: '/afficher/:uuid',
+  statusCode: 400,
+  duration: '3ms',
+  userAgent: 'PostmanRuntime/7.39.1',
+  ip: '::ffff:172.18.0.1',
+  query: {},
+  body: undefined,
+  level: 'warn',
+  message: 'API Call Warning'
+}
+{
+  service: 'api-produits',
+  timestamp: '2025-06-13 12:21:51',
+  method: 'POST',
+  url: '/api/produits',
+  route: '/',
+  statusCode: 404,
+  duration: '4ms',
+  userAgent: 'PostmanRuntime/7.39.1',
+  ip: '::ffff:172.18.0.1',
+  query: {},
+  body: {
+    nom: 'Café Arabica',
+    description: 'Café de haute qualité',
+    prix: 10.99,
+    stock: 25,
+    photo_url: 'https://example.com/images/cafe-arabica.jpg'
+  },
+  level: 'warn',
+  message: 'API Call Warning'
+}
+{
+  service: 'api-produits',
+  timestamp: '2025-06-13 12:21:51',
+  method: 'POST',
+  url: '/api/produits',
+  route: '/',
+  statusCode: 404,
+  duration: '4ms',
+  userAgent: 'PostmanRuntime/7.39.1',
+  ip: '::ffff:172.18.0.1',
+  query: {},
+  body: {
+    description: 'Café de haute qualité',
+    stock: 25,
+    photo_url: 'https://example.com/images/cafe-arabica.jpg'
+  },
+  level: 'warn',
+  message: 'API Call Warning'
+}
+{
+  service: 'api-produits',
+  timestamp: '2025-06-13 12:21:51',
+  method: 'PUT',
+  url: '/api/produits/modifier/9eca355c-1984-4601-a2bb-9a36a80f5187',
+  route: '/modifier/:uuid',
+  statusCode: 403,
+  duration: '4ms',
+  userAgent: 'PostmanRuntime/7.39.1',
+  ip: '::ffff:172.18.0.1',
+  query: {},
+  body: undefined,
+  level: 'warn',
+  message: 'API Call Warning'
+}
+{
+  service: 'api-produits',
+  timestamp: '2025-06-13 12:21:51',
+  method: 'PUT',
+  url: '/api/produits/modifier/invalid-uuid',
+  route: '/modifier/:uuid',
+  statusCode: 403,
+  duration: '4ms',
+  userAgent: 'PostmanRuntime/7.39.1',
+  ip: '::ffff:172.18.0.1',
+  query: {},
+  body: undefined,
+  level: 'warn',
+  message: 'API Call Warning'
+}
+{
+  service: 'api-produits',
+  timestamp: '2025-06-13 12:21:51',
+  method: 'DELETE',
+  url: '/api/produits/supprimer/9eca355c-1984-4601-a2bb-9a36a80f5187',
+  route: '/supprimer/:uuid',
+  statusCode: 403,
+  duration: '3ms',
+  userAgent: 'PostmanRuntime/7.39.1',
+  ip: '::ffff:172.18.0.1',
+  query: {},
+  body: undefined,
+  level: 'warn',
+  message: 'API Call Warning'
+}
+{
+  service: 'api-produits',
+  timestamp: '2025-06-13 12:21:51',
+  method: 'DELETE',
+  url: '/api/produits/supprimer/invalid-uuid',
+  route: '/supprimer/:uuid',
+  statusCode: 403,
+  duration: '3ms',
+  userAgent: 'PostmanRuntime/7.39.1',
+  ip: '::ffff:172.18.0.1',
+  query: {},
+  body: undefined,
+  level: 'warn',
+  message: 'API Call Warning'
+}
+{
+  service: 'api-produits',
+  timestamp: '2025-06-13 12:22:18',
+  method: 'GET',
+  url: '/api/produits/afficherAll',
+  route: '/afficherAll',
+  statusCode: 500,
+  duration: '5145ms',
+  userAgent: 'PostmanRuntime/7.39.1',
+  ip: '::ffff:172.18.0.1',
+  query: {},
+  body: undefined,
+  level: 'warn',
+  message: 'API Call Warning'
+}
+{
+  service: 'api-produits',
+  timestamp: '2025-06-13 12:22:23',
+  method: 'GET',
+  url: '/api/produits/afficher/9eca355c-1984-4601-a2bb-9a36a80f5187',
+  route: '/afficher/:uuid',
+  statusCode: 200,
+  duration: '0ms',
+  userAgent: 'PostmanRuntime/7.39.1',
+  ip: '::ffff:172.18.0.1',
+  query: {},
+  body: undefined,
+  error: {
+    message: '\n' +
+      'Invalid `prisma.produit.findUnique()` invocation in\n' +
+      '/usr/src/app/services/produits.js:25:42\n' +
+      '\n' +
+      '  22 }\n' +
+      '  23 \n' +
+      '  24 async getProduit(uuid) {\n' +
+      '→ 25   const produit = await prisma.produit.findUnique(\n' +
+      "Can't reach database server at `db.khgblbqooxqtbyrjepjf.supabase.co:5432`\n" +
+      '\n' +
+      'Please make sure your database server is running at `db.khgblbqooxqtbyrjepjf.supabase.co:5432`.',
+    stack: 'PrismaClientInitializationError: \n' +
+      'Invalid `prisma.produit.findUnique()` invocation in\n' +
+      '/usr/src/app/services/produits.js:25:42\n' +
+      '\n' +
+      '  22 }\n' +
+      '  23 \n' +
+      '  24 async getProduit(uuid) {\n' +
+      '→ 25   const produit = await prisma.produit.findUnique(\n' +
+      "Can't reach database server at `db.khgblbqooxqtbyrjepjf.supabase.co:5432`\n" +
+      '\n' +
+      'Please make sure your database server is running at `db.khgblbqooxqtbyrjepjf.supabase.co:5432`.\n' +
+      '    at Zn.handleRequestError (/usr/src/app/node_modules/@prisma/client/runtime/library.js:121:7759)\n' +
+      '    at Zn.handleAndLogRequestError (/usr/src/app/node_modules/@prisma/client/runtime/library.js:121:6784)\n' +
+      '    at Zn.request (/usr/src/app/node_modules/@prisma/client/runtime/library.js:121:6491)\n' +
+      '    at async l (/usr/src/app/node_modules/@prisma/client/runtime/library.js:130:9778)\n' +
+      '    at async ProduitService.getProduit (/usr/src/app/services/produits.js:25:21)\n' +
+      '    at async afficher (/usr/src/app/controllers/produits/afficher.js:6:21)',
+    name: 'PrismaClientInitializationError'
+  },
+  level: 'error',
+  message: 'API Call Failed'
+}
+{
+  service: 'api-produits',
+  clientVersion: '6.8.2',
+  errorCode: undefined,
+  retryable: undefined,
+  name: 'PrismaClientInitializationError',
+  level: 'error',
+  message: 'Erreur: \n' +
+    'Invalid `prisma.produit.findUnique()` invocation in\n' +
+    '/usr/src/app/services/produits.js:25:42\n' +
+    '\n' +
+    '  22 }\n' +
+    '  23 \n' +
+    '  24 async getProduit(uuid) {\n' +
+    '→ 25   const produit = await prisma.produit.findUnique(\n' +
+    "Can't reach database server at `db.khgblbqooxqtbyrjepjf.supabase.co:5432`\n" +
+    '\n' +
+    'Please make sure your database server is running at `db.khgblbqooxqtbyrjepjf.supabase.co:5432`.',
+  stack: 'PrismaClientInitializationError: \n' +
+    'Invalid `prisma.produit.findUnique()` invocation in\n' +
+    '/usr/src/app/services/produits.js:25:42\n' +
+    '\n' +
+    '  22 }\n' +
+    '  23 \n' +
+    '  24 async getProduit(uuid) {\n' +
+    '→ 25   const produit = await prisma.produit.findUnique(\n' +
+    "Can't reach database server at `db.khgblbqooxqtbyrjepjf.supabase.co:5432`\n" +
+    '\n' +
+    'Please make sure your database server is running at `db.khgblbqooxqtbyrjepjf.supabase.co:5432`.\n' +
+    '    at Zn.handleRequestError (/usr/src/app/node_modules/@prisma/client/runtime/library.js:121:7759)\n' +
+    '    at Zn.handleAndLogRequestError (/usr/src/app/node_modules/@prisma/client/runtime/library.js:121:6784)\n' +
+    '    at Zn.request (/usr/src/app/node_modules/@prisma/client/runtime/library.js:121:6491)\n' +
+    '    at async l (/usr/src/app/node_modules/@prisma/client/runtime/library.js:130:9778)\n' +
+    '    at async ProduitService.getProduit (/usr/src/app/services/produits.js:25:21)\n' +
+    '    at async afficher (/usr/src/app/controllers/produits/afficher.js:6:21)',
+  timestamp: '2025-06-13 12:22:23'
+}
+{
+  service: 'api-produits',
+  timestamp: '2025-06-13 12:22:23',
+  method: 'GET',
+  url: '/api/produits/afficher/9eca355c-1984-4601-a2bb-9a36a80f5187',
+  route: '/afficher/:uuid',
+  statusCode: 500,
+  duration: '5132ms',
+  userAgent: 'PostmanRuntime/7.39.1',
+  ip: '::ffff:172.18.0.1',
+  query: {},
+  body: undefined,
+  level: 'warn',
+  message: 'API Call Warning'
+}
+{
+  service: 'api-produits',
+  timestamp: '2025-06-13 12:22:23',
+  method: 'GET',
+  url: '/api/produits/afficher/invalid-uuid',
+  route: '/afficher/:uuid',
+  statusCode: 400,
+  duration: '4ms',
+  userAgent: 'PostmanRuntime/7.39.1',
+  ip: '::ffff:172.18.0.1',
+  query: {},
+  body: undefined,
+  level: 'warn',
+  message: 'API Call Warning'
+}
+{
+  service: 'api-produits',
+  timestamp: '2025-06-13 12:22:23',
+  method: 'POST',
+  url: '/api/produits',
+  route: '/',
+  statusCode: 404,
+  duration: '7ms',
+  userAgent: 'PostmanRuntime/7.39.1',
+  ip: '::ffff:172.18.0.1',
+  query: {},
+  body: {
+    nom: 'Café Arabica',
+    description: 'Café de haute qualité',
+    prix: 10.99,
+    stock: 25,
+    photo_url: 'https://example.com/images/cafe-arabica.jpg'
+  },
+  level: 'warn',
+  message: 'API Call Warning'
+}
+{
+  service: 'api-produits',
+  timestamp: '2025-06-13 12:22:24',
+  method: 'POST',
+  url: '/api/produits',
+  route: '/',
+  statusCode: 404,
+  duration: '3ms',
+  userAgent: 'PostmanRuntime/7.39.1',
+  ip: '::ffff:172.18.0.1',
+  query: {},
+  body: {
+    description: 'Café de haute qualité',
+    stock: 25,
+    photo_url: 'https://example.com/images/cafe-arabica.jpg'
+  },
+  level: 'warn',
+  message: 'API Call Warning'
+}
+{
+  service: 'api-produits',
+  timestamp: '2025-06-13 12:22:24',
+  method: 'PUT',
+  url: '/api/produits/modifier/9eca355c-1984-4601-a2bb-9a36a80f5187',
+  route: '/modifier/:uuid',
+  statusCode: 403,
+  duration: '3ms',
+  userAgent: 'PostmanRuntime/7.39.1',
+  ip: '::ffff:172.18.0.1',
+  query: {},
+  body: undefined,
+  level: 'warn',
+  message: 'API Call Warning'
+}
+{
+  service: 'api-produits',
+  timestamp: '2025-06-13 12:22:24',
+  method: 'PUT',
+  url: '/api/produits/modifier/invalid-uuid',
+  route: '/modifier/:uuid',
+  statusCode: 403,
+  duration: '5ms',
+  userAgent: 'PostmanRuntime/7.39.1',
+  ip: '::ffff:172.18.0.1',
+  query: {},
+  body: undefined,
+  level: 'warn',
+  message: 'API Call Warning'
+}
+{
+  service: 'api-produits',
+  timestamp: '2025-06-13 12:22:24',
+  method: 'DELETE',
+  url: '/api/produits/supprimer/9eca355c-1984-4601-a2bb-9a36a80f5187',
+  route: '/supprimer/:uuid',
+  statusCode: 403,
+  duration: '3ms',
+  userAgent: 'PostmanRuntime/7.39.1',
+  ip: '::ffff:172.18.0.1',
+  query: {},
+  body: undefined,
+  level: 'warn',
+  message: 'API Call Warning'
+}
+{
+  service: 'api-produits',
+  timestamp: '2025-06-13 12:22:24',
+  method: 'DELETE',
+  url: '/api/produits/supprimer/invalid-uuid',
+  route: '/supprimer/:uuid',
+  statusCode: 403,
+  duration: '4ms',
+  userAgent: 'PostmanRuntime/7.39.1',
+  ip: '::ffff:172.18.0.1',
+  query: {},
+  body: undefined,
+  level: 'warn',
+  message: 'API Call Warning'
+}

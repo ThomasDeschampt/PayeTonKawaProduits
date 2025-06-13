@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const rabbitmq = require('../services/rabbitmq');
+const rabbitmq = require('../services/rabbitmqService');
 
 const { authorized, adminOnly, authorizedRole } = require("../middleware/auth");
 const validateUUID = require('../middleware/uuidValidation.js');
