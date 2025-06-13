@@ -1,4 +1,5 @@
 const produitService = require('../../services/produits');
+const rabbitmq = require('../../services/rabbitmqService');
 
 const modifier = async (req, res, next) => {
   try {
@@ -11,6 +12,8 @@ const modifier = async (req, res, next) => {
         message: 'Produit non trouvé'
       });
     }
+
+    await rabbitmq.publishProductUpdated(produit);
 
     res.status(200).json({
       success: true,

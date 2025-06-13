@@ -49,10 +49,21 @@ app.use('*', (req, res) => {
 app.use(errorMetricsMiddleware); 
 app.use(errorHandler);
 
+async function initializeRabbitMQ() {
+    try {
+        await rabbitmq.connect();
+        await rabbitmq.consumeMessages();
+        console.log('RabbitMQ initialized and consuming messages');
+    } catch (error) {
+        console.error('Failed to initialize RabbitMQ:', error);
+        process.exit(1);
+    }
+}
+
 const server = app.listen(config.server.port, async () => {
     try {
         // Initialiser RabbitMQ
-        await rabbitmq.connect();
+        await initializeRabbitMQ();
         
         logger.info('Server started', {
             port: config.server.port,
@@ -73,19 +84,13 @@ const server = app.listen(config.server.port, async () => {
 });
 
 process.on('SIGTERM', async () => {
-    console.log('Arrêt du serveur...');
-    server.close(async () => {
-        await prisma.$disconnect();
-        await rabbitmq.close();
-        process.exit(0);
-    });
+    console.log('SIGTERM received. Closing RabbitMQ connection...');
+    await rabbitmq.close();
+    process.exit(0);
 });
 
 process.on('SIGINT', async () => {
-    console.log('Arrêt du serveur...');
-    server.close(async () => {
-        await prisma.$disconnect();
-        await rabbitmq.close();
-        process.exit(0);
-    });
+    console.log('SIGINT received. Closing RabbitMQ connection...');
+    await rabbitmq.close();
+    process.exit(0);
 });
