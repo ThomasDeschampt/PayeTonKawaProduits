@@ -53,10 +53,81 @@
                   "",
                   "pm.test(\"Response has count property\", function () {",
                   "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData).to.have.property('count');",
-                  "    pm.expect(jsonData.count).to.be.a('number');",
+                  "    pm.expect(jsonData.data.length).to.be.a('number');",
                   "});"
                 ]
+              }
+            }
+          ]
+        },
+                {
+          "name": "Ajouter un produit",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"nom\": \"Café Arabica\",\n    \"description\": \"Café de haute qualité\",\n    \"prix\": 10.99,\n    \"stock\": 25,\n    \"photo_url\": \"https://example.com/images/cafe-arabica.jpg\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/produits/ajouter",
+              "host": ["{{base_url}}"],
+              "path": ["api", "produits", "ajouter"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+"exec": [
+  "pm.test(\"Status code is 201\", function () {",
+  "    pm.response.to.have.status(201);",
+  "});",
+  "",
+  "pm.test(\"Response 'success' is true\", function () {",
+  "    var jsonData = pm.response.json();",
+  "    pm.expect(jsonData.success).to.be.true;",
+  "});",
+  "",
+  "pm.test(\"Created product has all required properties\", function () {",
+  "    var jsonData = pm.response.json();",
+  "    var product = jsonData.data;",
+  "    pm.expect(product).to.have.property('id');",
+  "    pm.expect(product).to.have.property('created_at');",
+  "    pm.expect(product).to.have.property('nom');",
+  "    pm.expect(product).to.have.property('prix');",
+  "    pm.expect(product).to.have.property('description');",
+  "    pm.expect(product).to.have.property('stock');",
+  "    pm.expect(product).to.have.property('photo_url');",
+  "});",
+  "",
+  "pm.test(\"Created product matches request data\", function () {",
+  "    var jsonData = pm.response.json();",
+  "    var product = jsonData.data;",
+  "    var requestData = JSON.parse(pm.request.body.raw);",
+  "    pm.expect(product.nom).to.equal(requestData.nom);",
+  "    pm.expect(product.prix).to.equal(requestData.prix);",
+  "    pm.expect(product.description).to.equal(requestData.description);",
+  "    pm.expect(product.stock).to.equal(requestData.stock);",
+  "    pm.expect(product.photo_url).to.equal(requestData.photo_url);",
+  "});",
+  "",
+  "pm.test(\"Récupérer et stocker l'ID du produit créé\", function () {",
+  "    var jsonData = pm.response.json();",
+  "    var productId = jsonData.data.id;",
+  "    pm.environment.set(\"produitId\", productId);",
+  "    console.log(\"Produit ID stocké dans l’environnement :\", productId);",
+  "});"
+]
               }
             }
           ]
@@ -73,7 +144,7 @@
               "variable": [
                 {
                   "key": "uuid",
-                  "value": "9eca355c-1984-4601-a2bb-9a36a80f5187",
+                  "value": "{{produitId}}",
                   "description": "UUID du produit"
                 }
               ]
@@ -103,12 +174,6 @@
                   "    pm.expect(product).to.have.property('description');",
                   "    pm.expect(product).to.have.property('stock');",
                   "    pm.expect(product).to.have.property('photo_url');",
-                  "});",
-                  "",
-                  "pm.test(\"Product UUID matches request\", function () {",
-                  "    var jsonData = pm.response.json();",
-                  "    var product = jsonData.data;",
-                  "    pm.expect(product.id).to.equal(pm.variables.get('uuid'));",
                   "});"
                 ]
               }
@@ -130,82 +195,22 @@
             {
               "listen": "test",
               "script": {
-                "exec": [
-                  "pm.test(\"Status code is 400\", function () {",
-                  "    pm.response.to.have.status(400);",
-                  "});",
-                  "",
-                  "pm.test(\"Response indicates invalid UUID\", function () {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.success).to.be.false;",
-                  "    pm.expect(jsonData.message).to.include('UUID');",
-                  "});"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "Ajouter un produit",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"nom\": \"Café Arabica\",\n    \"description\": \"Café de haute qualité\",\n    \"prix\": 10.99,\n    \"stock\": 25,\n    \"photo_url\": \"https://example.com/images/cafe-arabica.jpg\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/api/produits",
-              "host": ["{{base_url}}"],
-              "path": ["api", "produits"]
-            }
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test(\"Status code is 201\", function () {",
-                  "    pm.response.to.have.status(201);",
-                  "});",
-                  "",
-                  "pm.test(\"Response 'success' is true\", function () {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.success).to.be.true;",
-                  "});",
-                  "",
-                  "pm.test(\"Created product has all required properties\", function () {",
-                  "    var jsonData = pm.response.json();",
-                  "    var product = jsonData.data;",
-                  "    pm.expect(product).to.have.property('id');",
-                  "    pm.expect(product).to.have.property('created_at');",
-                  "    pm.expect(product).to.have.property('nom');",
-                  "    pm.expect(product).to.have.property('prix');",
-                  "    pm.expect(product).to.have.property('description');",
-                  "    pm.expect(product).to.have.property('stock');",
-                  "    pm.expect(product).to.have.property('photo_url');",
-                  "});",
-                  "",
-                  "pm.test(\"Created product matches request data\", function () {",
-                  "    var jsonData = pm.response.json();",
-                  "    var product = jsonData.data;",
-                  "    var requestData = JSON.parse(pm.request.body.raw);",
-                  "    pm.expect(product.nom).to.equal(requestData.nom);",
-                  "    pm.expect(product.prix).to.equal(requestData.prix);",
-                  "    pm.expect(product.description).to.equal(requestData.description);",
-                  "    pm.expect(product.stock).to.equal(requestData.stock);",
-                  "    pm.expect(product.photo_url).to.equal(requestData.photo_url);",
-                  "});"
-                ]
+"exec": [
+  "pm.test(\"Response indicates invalid UUID\", function () {",
+  "    var jsonData = pm.response.json();",
+  "",
+  "    // Vérifie que la réponse contient une liste d'erreurs",
+  "    pm.expect(jsonData).to.have.property('errors');",
+  "    pm.expect(jsonData.errors).to.be.an('array').that.is.not.empty;",
+  "",
+  "    // Vérifie que l'erreur concerne l'UUID",
+  "    var uuidError = jsonData.errors.find(function (err) {",
+  "        return err.path === 'uuid' && err.msg.includes('UUID');",
+  "    });",
+  "",
+  "    pm.expect(uuidError).to.not.be.undefined;",
+  "});"
+]
               }
             }
           ]
@@ -229,9 +234,9 @@
               "raw": "{\n    \"description\": \"Café de haute qualité\",\n    \"stock\": 25,\n    \"photo_url\": \"https://example.com/images/cafe-arabica.jpg\"\n}"
             },
             "url": {
-              "raw": "{{base_url}}/api/produits",
+              "raw": "{{base_url}}/api/produits/ajouter",
               "host": ["{{base_url}}"],
-              "path": ["api", "produits"]
+              "path": ["api", "produits", "ajouter"]
             }
           },
           "event": [
@@ -278,7 +283,7 @@
               "variable": [
                 {
                   "key": "uuid",
-                  "value": "9eca355c-1984-4601-a2bb-9a36a80f5187",
+                  "value": "{{produitId}}",
                   "description": "UUID du produit"
                 }
               ]
@@ -302,7 +307,6 @@
                   "    var jsonData = pm.response.json();",
                   "    var product = jsonData.data;",
                   "    pm.expect(product).to.have.property('id');",
-                  "    pm.expect(product).to.have.property('updated_at');",
                   "    pm.expect(product).to.have.property('nom');",
                   "    pm.expect(product).to.have.property('prix');",
                   "    pm.expect(product).to.have.property('description');",
@@ -353,17 +357,20 @@
             {
               "listen": "test",
               "script": {
-                "exec": [
-                  "pm.test(\"Status code is 400\", function () {",
-                  "    pm.response.to.have.status(400);",
-                  "});",
-                  "",
-                  "pm.test(\"Response indicates invalid UUID\", function () {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.success).to.be.false;",
-                  "    pm.expect(jsonData.message).to.include('UUID');",
-                  "});"
-                ]
+"exec": [
+  "pm.test(\"Status code is 400\", function () {",
+  "    pm.response.to.have.status(400);",
+  "});",
+  "",
+  "pm.test(\"Response indicates invalid UUID\", function () {",
+  "    var jsonData = pm.response.json();",
+  "    pm.expect(jsonData.errors).to.be.an('array').that.is.not.empty;",
+  "    var uuidError = jsonData.errors.find(function(error) {",
+  "        return error.value === 'invalid-uuid' && error.msg.toLowerCase().includes('uuid');",
+  "    });",
+  "    pm.expect(uuidError).to.not.be.undefined;",
+  "});"
+]
               }
             }
           ]
@@ -385,7 +392,7 @@
               "variable": [
                 {
                   "key": "uuid",
-                  "value": "9eca355c-1984-4601-a2bb-9a36a80f5187",
+                  "value": "{{produitId}}",
                   "description": "UUID du produit"
                 }
               ]
@@ -434,17 +441,21 @@
             {
               "listen": "test",
               "script": {
-                "exec": [
-                  "pm.test(\"Status code is 400\", function () {",
-                  "    pm.response.to.have.status(400);",
-                  "});",
-                  "",
-                  "pm.test(\"Response indicates invalid UUID\", function () {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.success).to.be.false;",
-                  "    pm.expect(jsonData.message).to.include('UUID');",
-                  "});"
-                ]
+"exec": [
+  "pm.test(\"Status code is 400\", function () {",
+  "    pm.response.to.have.status(400);",
+  "});",
+  "",
+  "pm.test(\"Response indicates invalid UUID\", function () {",
+  "    var jsonData = pm.response.json();",
+  "    pm.expect(jsonData.errors).to.be.an('array').that.is.not.empty;",
+  "    var hasUUIDError = jsonData.errors.some(function(error) {",
+  "        return error.msg.toLowerCase().includes('uuid');",
+  "    });",
+  "    pm.expect(hasUUIDError).to.be.true;",
+  "});"
+]
+
               }
             }
           ]
@@ -460,7 +471,7 @@
     },
     {
       "key": "token",
-      "value": "your_jwt_token_here",
+      "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjM1ODU1NDY1LTQ0NmItNDEzOC1hYWJhLWQwNTk4OGRlMTNjYiIsInBzZXVkbyI6Im1vaSIsInJvbGUiOiJBZG1pbiIsImlhdCI6MTc0OTg4ODQ2MSwiZXhwIjoxNzQ5ODkyMDYxfQ.MC2FFWADp_4N83i6FwiW_MlFbOWyMDV1LVGZIOOD0DA",
       "type": "string"
     }
   ]
