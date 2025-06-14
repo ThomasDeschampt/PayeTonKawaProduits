@@ -26,8 +26,7 @@ jobs:
 
       - name: Run container briefly (sanity check)
         run: |
-          docker run -d --name app-test -e JWT_SECRET=secrets.JWT_SECRET payetonkawa-produit
-          sleep 10
+          docker run -d --name app-test -e JWT_SECRET=${{ secrets.JWT_SECRET }} payetonkawa-produit
 
       - name: Show container logs
         run: docker logs app-test || true
