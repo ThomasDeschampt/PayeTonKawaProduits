@@ -1,0 +1,30 @@
+name: CI_tests_unitaires_Clients
+
+on:
+  push:
+    branches:
+      - main
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Cloner le code du dépôt
+        uses: actions/checkout@v4
+
+      - name: Configurer l'environnement Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Installer les dépendances npm
+        run: npm ci
+
+      - name: Lancer les tests unitaires avec Jest
+        run: npm test -- --coverage
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          JWT_EXPIRE: ${{ secrets.JWT_EXPIRE }}
+          PORT: 3000
