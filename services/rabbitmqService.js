@@ -250,6 +250,20 @@ class RabbitMQService {
         }
     }
 
+    async publishStockRefused(data) {
+        try {
+            await this.channel.sendToQueue(
+            this.queues.stockRefused,
+            Buffer.from(JSON.stringify(data)),
+            { persistent: true }
+            );
+        } catch (error) {
+            console.error('Error publishing stock refused message:', error);
+            throw error;
+        }
+    }
+
+
     async publishProductDeleted(productId) {
         try {
             await this.channel.sendToQueue(

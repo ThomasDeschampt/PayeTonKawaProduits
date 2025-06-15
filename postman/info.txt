@@ -8,7 +8,7 @@ npm start
 
 Etape 2 : Récupérer le token JWT
 Pour récupérer le token JWT, vous pouvez utiliser Postman pour faire une requête POST à l'endpoint de vérification du micro service client.
-Une fois le token récupéré, copiez-le dans le fichier postman_environment.json à la ligne 13.
+Une fois le token récupéré, copiez-le dans le fichier postman_environment.json à la ligne 13 et dans le fichier postman_collection.json à la ligne 474.
 
 Etape 3 : Lancer les tests d'intégration
 newman run .\postman\postman_collection.json -e .\postman\postman_environment.json

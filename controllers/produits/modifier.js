@@ -21,6 +21,11 @@ const modifier = async (req, res, next) => {
       message: 'Produit modifié avec succès'
     });
   } catch (error) {
+    console.error(`Erreur lors de la modification du produit ${req.params.uuid} : ${error.message}`, {
+      body: req.body,
+      stack: error.stack
+    });
+    
     next(error);
   }
 };

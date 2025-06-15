@@ -1,6 +1,7 @@
 const { PrismaClient } = require("@prisma/client");
 const { ValidationError, NotFoundError } = require('../utils/errors');
 const prisma = new PrismaClient();
+const rabbitmq = require('../services/rabbitmqService');
 
 class ProduitService {
   async createProduit(produitData) {
@@ -41,28 +42,40 @@ class ProduitService {
     });
   }
 
-  async updateProduit(uuid, produitData) {
-    const produit = await prisma.produit.findUnique({
-      where: { id: uuid }
-    });
+async updateProduit(uuid, produitData) {
+  const produit = await prisma.produit.findUnique({
+    where: { id: uuid }
+  });
 
-    if (!produit) {
-      throw new NotFoundError('Produit non trouvé');
-    }
-
-    const { nom, description, prix, stock, photo_url } = produitData;
-
-    return await prisma.produit.update({
-      where: { id: uuid },
-      data: {
-        nom,
-        description,
-        prix: prix ? parseFloat(prix) : undefined,
-        stock: stock ? parseInt(stock) : undefined,
-        photo_url
-      }
-    });
+  if (!produit) {
+    throw new NotFoundError('Produit non trouvé');
   }
+
+  const { nom, description, prix, stock, photo_url } = produitData;
+
+  if (stock !== undefined && parseInt(stock) > produit.stock) {
+    await rabbitmq.publishStockRefused({
+      produitId: uuid,
+      stockDemandé: stock,
+      stockActuel: produit.stock,
+      message: 'Demande de stock invalide'
+    });
+
+    throw new Error(`Stock invalide : le stock demandé (${stock}) est supérieur au stock actuel (${produit.stock})`);
+  }
+
+  return await prisma.produit.update({
+    where: { id: uuid },
+    data: {
+      nom,
+      description,
+      prix: prix !== undefined ? parseFloat(prix) : undefined,
+      stock: stock !== undefined ? parseInt(stock) : undefined,
+      photo_url
+    }
+  });
+}
+
 
   async deleteProduit(uuid) {
     const produit = await prisma.produit.findUnique({
