@@ -1,7 +1,6 @@
 const { PrismaClient } = require("@prisma/client");
 const { ValidationError, NotFoundError } = require('../utils/errors');
 const prisma = new PrismaClient();
-const rabbitmq = require('../services/rabbitmqService');
 
 class ProduitService {
   async createProduit(produitData) {
@@ -52,17 +51,6 @@ async updateProduit(uuid, produitData) {
   }
 
   const { nom, description, prix, stock, photo_url } = produitData;
-
-  if (stock !== undefined && parseInt(stock) > produit.stock) {
-    await rabbitmq.publishStockRefused({
-      produitId: uuid,
-      stockDemandé: stock,
-      stockActuel: produit.stock,
-      message: 'Demande de stock invalide'
-    });
-
-    throw new Error(`Stock invalide : le stock demandé (${stock}) est supérieur au stock actuel (${produit.stock})`);
-  }
 
   return await prisma.produit.update({
     where: { id: uuid },
