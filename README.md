@@ -56,7 +56,7 @@ npm start
 
 ## Documentation API
 
-La documentation Swagger est disponible à l'adresse : `http://localhost:3007/api-docs`
+La documentation Swagger est disponible à l'adresse : `http://localhost:3001/api-docs`
 
 ## Tests
 
