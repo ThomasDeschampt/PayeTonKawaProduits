@@ -140,6 +140,7 @@ class RabbitMQService {
                         for (const produit of content.produits) {
                             ProduitService.reduireStock(produit.id_prod, produit.quantite);
                         }
+                        await this.publishOrderStatusChanged(content.id, 'validée');
                         this.channel.ack(msg);
                     } catch (error) {
                         console.error('Error processing order created message:', error);
@@ -289,6 +290,19 @@ class RabbitMQService {
             );
         } catch (error) {
             console.error('Error publishing stock updated message:', error);
+            throw error;
+        }
+    }
+
+    async publishOrderStatusChanged(orderData) {
+        try {
+            await this.channel.sendToQueue(
+                this.queues.orderStatusChanged,
+                Buffer.from(JSON.stringify(orderData)),
+                { persistent: true }
+            );
+        } catch (error) {
+            console.error('Error publishing order status changed message:', error);
             throw error;
         }
     }
