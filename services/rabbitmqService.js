@@ -1,5 +1,7 @@
 const amqp = require('amqplib');
 require('dotenv').config();
+const ProduitService = require('./produits');
+
 
 const RABBITMQ_URL = process.env.RABBITMQ_URL || 'amqp://admin:admin@localhost:4001';
 const MAX_RETRIES = 3;
@@ -124,12 +126,15 @@ class RabbitMQService {
                 }
             });
 
-            // Consommation des messages commandes
             await this.channel.consume(this.queues.orderCreated, async (msg) => {
                 if (msg !== null) {
                     try {
                         const content = JSON.parse(msg.content.toString());
                         console.log('Received order created message:', content);
+
+                        for (const produit of content.produits) {
+                            ProduitService.reduireStock(produit.id_prod, produit.quantite);
+                        }
                         this.channel.ack(msg);
                     } catch (error) {
                         console.error('Error processing order created message:', error);

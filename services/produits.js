@@ -78,6 +78,27 @@ async updateProduit(uuid, produitData) {
       where: { id: uuid }
     });
   }
+
+  async reduireStock(uuid, quantite) {
+    const produit = await prisma.produit.findUnique({
+      where: { id: uuid }
+    });
+
+    if (!produit) {
+      throw new NotFoundError('Produit non trouvé');
+    }
+
+    if (produit.stock < quantite) {
+      throw new ValidationError('Stock insuffisant');
+    }
+
+    return await prisma.produit.update({
+      where: { id: uuid },
+      data: {
+        stock: produit.stock - quantite
+      }
+    });
+  }
 }
 
 module.exports = new ProduitService(); 
