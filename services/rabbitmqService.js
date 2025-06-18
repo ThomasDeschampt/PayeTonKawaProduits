@@ -1,6 +1,7 @@
 const amqp = require('amqplib');
 require('dotenv').config();
 const ProduitService = require('./produits');
+const { messagesSent, messagesReceived } = require('../metrics');
 
 
 const RABBITMQ_URL = process.env.RABBITMQ_URL || 'amqp://admin:admin@localhost:4001';
@@ -92,6 +93,7 @@ class RabbitMQService {
                     try {
                         const content = JSON.parse(msg.content.toString());
                         console.log('Received product created message:', content);
+                        messagesSent.inc({ queue: 'produit.created' });
                         this.channel.ack(msg);
                     } catch (error) {
                         console.error('Error processing product created message:', error);
@@ -105,6 +107,7 @@ class RabbitMQService {
                     try {
                         const content = JSON.parse(msg.content.toString());
                         console.log('Received product updated message:', content);
+                        messagesSent.inc({ queue: 'produit.updated' });
                         this.channel.ack(msg);
                     } catch (error) {
                         console.error('Error processing product updated message:', error);
@@ -118,6 +121,7 @@ class RabbitMQService {
                     try {
                         const content = JSON.parse(msg.content.toString());
                         console.log('Received product deleted message:', content);
+                        messagesSent.inc({ queue: 'produit.delete' });
                         this.channel.ack(msg);
                     } catch (error) {
                         console.error('Error processing product deleted message:', error);

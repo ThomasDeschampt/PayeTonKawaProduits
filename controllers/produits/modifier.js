@@ -1,5 +1,6 @@
 const produitService = require('../../services/produits');
 const rabbitmq = require('../../services/rabbitmqService');
+const { messagesSent, messagesReceived } = require('../../metrics');
 
 const modifier = async (req, res, next) => {
   try {
@@ -14,6 +15,7 @@ const modifier = async (req, res, next) => {
     }
 
     await rabbitmq.publishProductUpdated(produit);
+    messagesSent.inc({ queue: 'produit.updated' });
 
     res.status(200).json({
       success: true,
