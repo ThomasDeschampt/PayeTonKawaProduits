@@ -13,7 +13,6 @@
     ]
   },
   "editable": true,
-  "gnetId": null,
   "graphTooltip": 0,
   "id": null,
   "links": [],
@@ -22,331 +21,185 @@
       "datasource": "Prometheus",
       "fieldConfig": {
         "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "vis": false
-            }
-          },
+          "color": { "mode": "palette-classic" },
+          "custom": { "hideFrom": { "legend": false, "tooltip": false, "vis": false } },
           "mappings": []
         },
         "overrides": []
       },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 0
-      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
       "id": 1,
       "options": {
-        "legend": {
-          "displayMode": "visible",
-          "placement": "bottom"
-        },
+        "legend": { "displayMode": "table", "placement": "right", "values": ["value", "percent"] },
         "pieType": "pie",
-        "reduceOptions": {
-          "values": false,
-          "calcs": [
-            "lastNotNull"
-          ],
-          "fields": ""
-        },
-        "tooltip": {
-          "mode": "single"
-        }
+        "reduceOptions": { "values": false, "calcs": ["lastNotNull"], "fields": "" },
+        "tooltip": { "mode": "single" }
       },
       "targets": [
         {
           "expr": "sum by (status_code) (http_requests_total)",
           "interval": "",
-          "legendFormat": "Status {{status_code}}",
+          "legendFormat": "{{status_code}}",
           "refId": "A"
         }
       ],
-      "title": "Codes de statut HTTP",
+      "title": "Répartition des codes de statut HTTP",
       "type": "piechart"
     },
     {
       "datasource": "Prometheus",
       "fieldConfig": {
         "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
+          "color": { "mode": "palette-classic" },
           "custom": {
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
             "drawStyle": "line",
-            "fillOpacity": 0,
+            "fillOpacity": 10,
             "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "vis": false
-            },
+            "hideFrom": { "legend": false, "tooltip": false, "vis": false },
             "lineInterpolation": "linear",
-            "lineWidth": 1,
+            "lineWidth": 2,
             "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
+            "scaleDistribution": { "type": "linear" },
+            "showPoints": "never",
             "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
+            "stacking": { "group": "A", "mode": "none" },
+            "thresholdsStyle": { "mode": "off" }
           },
           "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          }
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "red", "value": 80 }] },
+          "unit": "reqps"
         },
         "overrides": []
       },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 0
-      },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
       "id": 2,
       "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom"
-        },
-        "tooltip": {
-          "mode": "single"
-        }
+        "legend": { "calcs": ["last", "max"], "displayMode": "table", "placement": "bottom" },
+        "tooltip": { "mode": "multi", "sort": "desc" }
       },
       "targets": [
         {
-          "expr": "rate(http_requests_total[5m])",
+          "expr": "sum by (route, method) (http_requests_total{route!~\"/metrics|/health|/swagger.*\"})",
           "interval": "",
           "legendFormat": "{{method}} {{route}}",
           "refId": "A"
         }
       ],
-      "title": "Taux de requêtes par minute",
+      "title": "Taux de requêtes par endpoint (req/sec)",
       "type": "timeseries"
     },
     {
       "datasource": "Prometheus",
       "fieldConfig": {
         "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
+          "color": { "mode": "palette-classic" },
           "custom": {
             "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
             "drawStyle": "line",
-            "fillOpacity": 0,
+            "fillOpacity": 10,
             "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "vis": false
-            },
+            "hideFrom": { "legend": false, "tooltip": false, "vis": false },
             "lineInterpolation": "linear",
-            "lineWidth": 1,
+            "lineWidth": 2,
             "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
+            "scaleDistribution": { "type": "linear" },
+            "showPoints": "never",
             "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
+            "stacking": { "group": "A", "mode": "none" },
+            "thresholdsStyle": { "mode": "off" }
           },
           "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          },
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "red", "value": 80 }] },
           "unit": "s"
         },
         "overrides": []
       },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 8
-      },
-      "id": 3,
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+      "id": 5,
       "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom"
-        },
-        "tooltip": {
-          "mode": "single"
-        }
+        "legend": { "calcs": ["last", "max"], "displayMode": "table", "placement": "bottom" },
+        "tooltip": { "mode": "multi", "sort": "desc" }
       },
       "targets": [
         {
-          "expr": "histogram_quantile(0.50, rate(http_request_duration_seconds_bucket[5m]))",
+          "expr": "sum by (route, method) (http_request_duration_seconds_sum{route!~\"/metrics|/health|/swagger.*\"}) / sum by (route, method) (http_request_duration_seconds_count{route!~\"/metrics|/health|/swagger.*\"})",
           "interval": "",
-          "legendFormat": "P50",
+          "legendFormat": "{{method}} {{route}}",
           "refId": "A"
-        },
-        {
-          "expr": "histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m]))",
-          "interval": "",
-          "legendFormat": "P95",
-          "refId": "B"
-        },
-        {
-          "expr": "histogram_quantile(0.99, rate(http_request_duration_seconds_bucket[5m]))",
-          "interval": "",
-          "legendFormat": "P99",
-          "refId": "C"
         }
       ],
-      "title": "Temps de réponse (Percentiles)",
+      "title": "Temps de réponse moyen par endpoint",
       "type": "timeseries"
     },
     {
-      "datasource": "Prometheus",
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 0,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "vis": false
-            },
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          }
-        },
-        "overrides": []
+  "datasource": "Prometheus",
+  "fieldConfig": {
+    "defaults": {
+      "color": { "mode": "palette-classic" },
+      "custom": {
+        "axisLabel": "",
+        "axisPlacement": "auto",
+        "barAlignment": 0,
+        "drawStyle": "line",
+        "fillOpacity": 20,
+        "gradientMode": "none",
+        "hideFrom": { "legend": false, "tooltip": false, "vis": false },
+        "lineInterpolation": "linear",
+        "lineWidth": 2,
+        "pointSize": 5,
+        "scaleDistribution": { "type": "linear" },
+        "showPoints": "never",
+        "spanNulls": false,
+        "stacking": { "group": "A", "mode": "none" },
+        "thresholdsStyle": { "mode": "off" }
       },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
-        "y": 8
+      "mappings": [],
+      "thresholds": {
+        "mode": "absolute",
+        "steps": [
+          { "color": "green", "value": null },
+          { "color": "red", "value": 80 }
+        ]
       },
-      "id": 4,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom"
-        },
-        "tooltip": {
-          "mode": "single"
-        }
-      },
-      "targets": [
-        {
-          "expr": "rate(rabbitmq_messages_sent_total[5m])",
-          "interval": "",
-          "legendFormat": "Messages envoyés {{queue}}",
-          "refId": "A"
-        },
-        {
-          "expr": "rate(rabbitmq_messages_received_total[5m])",
-          "interval": "",
-          "legendFormat": "Messages reçus {{queue}}",
-          "refId": "B"
-        }
-      ],
-      "title": "Messages RabbitMQ par minute",
-      "type": "timeseries"
+      "unit": "msg"
+    },
+    "overrides": []
+  },
+  "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+  "id": 4,
+  "options": {
+    "legend": {
+      "calcs": ["last", "max"],
+      "displayMode": "table",
+      "placement": "bottom"
+    },
+    "tooltip": { "mode": "multi", "sort": "desc" }
+  },
+  "targets": [
+    {
+      "expr": "rabbitmq_messages_sent_total",
+      "interval": "",
+      "legendFormat": "{{queue}}",
+      "refId": "A"
     }
+  ],
+  "title": "Messages RabbitMQ envoyés (5 min)",
+  "type": "timeseries"
+  }
   ],
   "schemaVersion": 27,
   "style": "dark",
-  "tags": [
-    "payetonkawa",
-    "api"
-  ],
-  "templating": {
-    "list": []
-  },
-  "time": {
-    "from": "now-1h",
-    "to": "now"
-  },
+  "tags": ["payetonkawa","api"],
+  "templating": { "list": [] },
+  "time": { "from": "now-1h", "to": "now" },
   "timepicker": {},
   "timezone": "",
   "title": "Payetonkawa - API Monitoring",
   "uid": "payetonkawa-api",
-  "version": 1
+  "version": 2
 }
