@@ -131,6 +131,7 @@ class RabbitMQService {
             });
 
             await this.channel.consume(this.queues.orderCreated, async (msg) => {
+                console.log('Consuming order created message...');
                 if (msg !== null) {
                     try {
                         const content = JSON.parse(msg.content.toString());
@@ -140,7 +141,6 @@ class RabbitMQService {
                         for (const produit of content.produits) {
                             ProduitService.reduireStock(produit.id_prod, produit.quantite);
                         }
-                        await this.publishOrderStatusChanged(content.id, 'validée');
                         this.channel.ack(msg);
                     } catch (error) {
                         console.error('Error processing order created message:', error);
